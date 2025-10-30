@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head >
+        <title>VENDOR LOGIN</title>
+<style>
+
+
+body{
+    font-family: sans-serif;
+    
+    
+}
+#container{
+   
+   display: flex;
+   flex-direction: column;
+   background-image: url('/static/back.jpg');
+   background-repeat: no-repeat;
+   background-size: cover;
+}
+
+h1{
+    text-align: center;
+    font-weight: 50;
+    color: white;
+    padding-top: 5%;
+}
+
+#loginBox{
+    text-align: center;
+    font-weight: 10px;
+    
+    width : 250px;
+    margin: 5% auto 20% auto;
+    height: 200px;
+    padding: 5% 5% 5% 5%;
+    border-radius: 20%;
+}
+#loginBox > label, input, button{
+    margin: 5% 5% 5% 5%;
+    color: white;
+   
+    
+}
+
+#userName, #password , #loginButton{
+    border: solid 0.1px white;
+    border-radius: 10px;
+    color: white;
+    font-weight: 10px;
+    background: none;
+    height: 30px;
+
+}
+#userName:hover, #password:hover , #loginButton:hover{
+    background-color: none;
+    color: white;
+    transition-delay: 0.1s;
+    transition-property: smooth;
+}
+.navbar , .footer{
+    background-color: black;
+    height: 100px;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+.navbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius:0 0 20% 20%;
+    justify-items: end;
+    align-items: center;
+    
+}
+
+
+.navbar > button, #slidebar{
+    
+    color: white;
+    font-size: 30px;
+    background: none;
+    border: none;
+    margin: 35px 20px 35px 20px;
+    
+}
+.navbar > h1{
+  
+    padding-bottom:5%;
+    padding-right: 1%;
+    text-align: right;
+    width: 50%;
+}
+
+#submenu , #submenu1{
+    display: flex;
+    text-decoration: none;
+    flex-direction: column;
+    position:fixed;
+    top:-100%;
+    transition: top 0.4s ease;
+    margin:100px 0 0 5%;
+    
+}
+#submenu > a , #submenu1 > a{
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 1;
+    padding-top: 10px;
+    text-align: justify;
+    width: auto;
+    height:20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+#menuButton{
+    text-align: left;
+}
+#submenu > a:hover , #submenu1 > a:hover{
+    background-color: grey;
+    border-radius: 10px;
+}
+#submenu.active , #submenu1.active{
+    top:0;
+    color: white;
+    font-size: 30px;
+
+}
+#slidebar{
+    width: 50%;
+    position: fixed;
+    left:-100%;
+    transition: left 0.4s ease;
+}
+#slidebar.active{
+    left:0;
+    color: white;
+    margin-left: 10%;
+
+   
+}
+#slidebar > a{
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    font-weight: 1;
+    padding:4px;
+}
+#slidebar > a:hover{
+    background-color: grey;
+    border-radius: 10px;
+    
+}
+
+.footer{
+    position: relative;
+    width: 100%;
+    margin-bottom: 0;
+    bottom: 0;
+    border-radius: 20% 20% 0 0;
+}
+
+
+
+</style>
+
+    </head>
+    
+    <body style="margin: 0;">
+            
+            <div class="navbar" >
+            
+                <button id = "menuButton">&#9881;</button>
+                <h1>PixOra</h1>
+                <div id="slidebar">
+                    <a href="#">Home</a>
+                    <a href="#" id = "dropDown">Login</a>
+                    <a href="#">Register</a>
+                    <a href="#">About Us</a>
+                    <a href="#">Reviews</a>
+                    <a href="#" id = "dropDown1">Sign Up</a>
+                </div>
+            </div>
+             <div id = "submenu">
+                        <a href="#">User Login</a>
+                        <a href="#">Admin Login</a>
+                        <a href="#">Vendor Login</a>
+            </div>
+             <div id = "submenu1">
+                        <a href="#">User Signup</a>
+                        <a href="#">Vendor Signup</a>
+            </div>
+            <div id="container">
+                <h1>PixOra</h1>
+                 <h1>Welcome to the Vendor login page!</h1>
+                <form id = "loginBox" action = "/vendorLogin" method="POST">
+                    <label for="userName">Username </label>
+                    <input type="text" id = "userName" name = "userName" placeholder="Enter your username">
+                    <br>
+                    <label for="password">Password </label>
+                    <input type="text" id = "password" name = "password" placeholder="Enter your password">
+                    <button id="loginButton" type="submit">LOG IN</button>
+                    {% if message %}
+                    <p style="color: white; background-color: gray; text-align:center; padding:10px; border-radius: 20px;">{{ message }}</p>
+                    {% endif %}
+                </form>
+                
+            </div>
+                <div class="footer"></div>
+        
+<script>
+
+
+    //from the first file
+    const button = document.getElementById('menuButton');
+    const bar = document.getElementById('slidebar');
+    const drop = document.getElementById('dropDown');
+    const submenu = document.getElementById('submenu');
+    const login = document.getElementById('loginButton');
+    const drop1 = document.getElementById('dropDown1');
+    const submenu1 = document.getElementById('submenu1');
+    button.addEventListener('click' , ()=> {
+        bar.classList.toggle('active');
+        submenu.classList.remove('active');
+        submenu1.classList.remove('active');
+
+    });
+
+    drop.addEventListener('click' , ()=>{
+    submenu.classList.toggle('active')
+    submenu1.classList.remove('active');
+
+    });
+    drop1.addEventListener('click' , ()=>{
+    submenu1.classList.toggle('active')
+    submenu.classList.remove('active');
+    });
+    login.addEventListener('click' , ()=>{
+        let password = document.getElementById('password').value;
+        let username = document.getElementById('username').value;
+    });
+
+
+
+</script>
+ 
+    </body>
+
+</html>

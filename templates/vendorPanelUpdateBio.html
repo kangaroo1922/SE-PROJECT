@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <head >
+        <title>UPDATE BIO</title>
+        <link>
+        
+        <style>
+*{
+    margin: 0;
+    text-decoration: none;
+    font-family: sans-serif;
+    padding: 0;
+}
+
+.navbar{
+    height: 180px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width:100%;
+    background: linear-gradient(to top, #000066 0%, #ff3399 100%);
+    color: white;
+    border-radius: 0 0 20% 20%;
+    padding-top: 50px;
+
+}
+.navbar > h1{
+    width: 50%;
+    height:100%;
+    text-align: right;
+    padding-right: 2%;
+    font-weight: 1;
+}
+.navbar > div{
+    width: 50%;
+    height:100%;
+}
+.menu{
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    
+}
+#button{
+    width:20%;
+    height:20%;
+    font-size: 30px;
+    background: none;
+    color: white;
+    border: none;
+    margin-left: 2%;
+}
+#slidebar{
+    width: 60%;
+   display: flex;
+   flex-direction:row;
+   flex-wrap: wrap;
+    text-decoration: none;
+    position: fixed;
+    left:-100%;
+    transition: left 0.4s ease;
+    
+}
+#slidebar > a{
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    font-weight: 1;
+    padding: 5px;
+}
+#slidebar > a:hover{
+    text-decoration: none;
+    color: white;
+    background-color: gray;
+    border-radius: 15px;
+}
+#slidebar.active{
+    left:0;
+    margin-left:10%;
+    color: black;
+    font-size: 50;
+}
+
+#submenu , #submenu1{
+    display: flex;
+    flex-direction: column;
+    top:-100%;
+    position:fixed;
+    transition: top 0.4s ease;
+    margin-left:10% ;
+}
+#submenu > a , #submenu1 > a{
+    color: white;
+    font-size: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding:3px;
+}
+#submenu > a:hover , #submenu1 > a:hover{
+    text-decoration: none;
+    color: white;
+    background-color: gray;
+    border-radius: 15px;
+}
+#submenu.active , #submenu1.active{
+    font-weight: 1;
+    top:0;
+    margin-left: 10%;
+    margin-top:150px;
+}
+
+#updationForm{
+    width: 70%;
+    text-align: center;
+    margin-left:auto;
+    margin-right: auto;
+    height: auto;
+    margin-top: 50px;
+    background-color: antiquewhite;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    justify-content: space-between;
+}
+.biodata,.description, .uploadPics{
+    width: 100%;
+    height:100%;
+    background-color: antiquewhite;
+    text-align: left;
+}
+#description{
+    width: 90%;
+    height: 150px;
+    resize: vertical;
+    display: block;
+    margin: 10px auto 10px auto;
+    border-radius: 20px;
+
+}
+#preview {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+}
+input[type="file"] {
+    margin-bottom: 20px;
+}
+
+.image-box {
+      width: 150px;
+      height: 150px;
+      border: 2px dashed #aaa;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+.image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+        </style>
+
+    </head>
+    
+    <body style="background-color: black;">
+            
+        <div class="navbar">
+         <div class = "menu">
+            <button id="button">&#9881;</button>
+             <div id="slidebar">
+                    <a href="#">View Profile And Orders</a>
+                    <a href="#">Logout</a>
+                    <a href="#">Update Bio</a>
+                    <a href="#">Reviews</a>
+                </div>
+            </div>
+             <h1>PixOra</h1>  
+
+        </div>
+            <div id = "submenu">
+                        <a href="#">User Login</a>
+                        <a href="#">Admin Login</a>
+                        <a href="#">Vendor Login</a>
+        </div>
+            <div id = "submenu1">
+                        <a href="#">User Signup</a>
+                        <a href="#">Vendor Signup</a>
+            </div>
+
+           <div id="updationForm" action="/vendorSignUp" method="POST">
+                <h1>Update your Profile</h1>
+
+                <div class="biodata">
+                    <h2>Enter your bio data</h2>
+                     <label for="name">Enter your full name </label>
+                    <input type="text" id = "name" placeholder="name">
+                   
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                    
+                    <label for="phone">Enter your phone number: </label>
+                    <input type="tel" id = "phoneNumber" name = "phone">
+
+                </div>
+
+                <div class="description">
+                    <h2>Enter your description</h2>
+                    <textarea name="description" id="description"></textarea>
+                </div>
+
+                <div class="uploadPics">
+                    <h2>Upload your Pictures</h2>
+                    <input type="file" id="fileInput" accept="image/*" multiple>
+                    <div id="preview"></div>
+                </div>
+                <div class="submission">
+                    <button>SUBMIT</button>
+                </div>
+
+           </div>
+
+          
+                
+        
+           <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+
+  fileInput.addEventListener('change', () => {
+    //preview.innerHTML = ''; // clear previous previews
+    const files = fileInput.files;
+
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const div = document.createElement('div');
+        div.classList.add('image-box');
+        div.innerHTML = `<img src="${e.target.result}" alt="Vendor photo">`;
+        preview.appendChild(div);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+});
+
+const button = document.getElementById('button');
+const bar = document.getElementById('slidebar');
+const submenu = document.getElementById('submenu');
+const drop = document.getElementById('dropDown');
+const submenu1 = document.getElementById('submenu1');
+const drop1 = document.getElementById('dropDown1');
+button.addEventListener('click' , ()=>{
+    bar.classList.toggle('active');
+    submenu.classList.remove('active');
+    submenu1.classList.remove('active');
+});
+drop.addEventListener('click' , ()=>{
+    submenu.classList.toggle('active');
+    submenu1.classList.remove('active');
+
+});
+drop1.addEventListener('click' , ()=>{
+    submenu1.classList.toggle('active');
+    submenu.classList.remove('active');
+});
+
+
+
+
+           </script>
+    </body>
+
+</html>

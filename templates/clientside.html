@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PixOra</title>
+          <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@400;500;600&display=swap"
+                    rel="stylesheet">
+
+          <style>
+                    /* ======= GENERAL THEME ======= */
+                    :root {
+                              --bg-dark: #0b0b0d;
+                              --bg-deep: #1a0b2e;
+                              --accent: #7f5eff;
+                              --accent-light: #a17eff;
+                              --text-light: #ffffff;
+                              --text-muted: #c5c5c5;
+                              --card-bg: rgba(255, 255, 255, 0.05);
+                    }
+
+                    * {
+                              margin: 0;
+                              padding: 0;
+                              box-sizing: border-box;
+                    }
+
+                    body {
+                              font-family: 'Poppins', sans-serif;
+                              background: linear-gradient(180deg, var(--bg-dark) 10%, var(--bg-deep) 100%);
+                              color: var(--text-light);
+                              min-height: 100vh;
+                              overflow-x: hidden;
+                    }
+
+                    /* ======= NAVBAR ======= */
+                    nav {
+                              position: fixed;
+                              top: 0;
+                              width: 100%;
+                              height: 70px;
+                              background: rgba(15, 15, 20, 0.75);
+                              backdrop-filter: blur(10px);
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              padding: 0 40px;
+                              z-index: 100;
+                              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    }
+
+                    /* Left - Toggle Menu */
+                    .menu-toggle {
+                              font-size: 24px;
+                              color: var(--text-light);
+                              cursor: pointer;
+                              transition: transform 0.3s ease;
+                    }
+
+                    .menu-toggle:hover {
+                              transform: rotate(90deg);
+                    }
+
+                    /* Center - Search Bar */
+                    .search-bar {
+                              position: relative;
+                              width: 40%;
+                              display: flex;
+                              align-items: center;
+                    }
+
+                    .search-bar input {
+                              width: 100%;
+                              background: transparent;
+                              border: none;
+                              border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                              color: var(--text-light);
+                              font-size: 14px;
+                              padding: 8px;
+                              outline: none;
+                    }
+
+                    .search-bar input::placeholder {
+                              color: rgba(255, 255, 255, 0.6);
+                    }
+
+                    /* Right - Logo + Buttons */
+                    .nav-right {
+                              display: flex;
+                              align-items: center;
+                              gap: 20px;
+                    }
+
+                    .nav-right button {
+                              background: none;
+                              border: none;
+                              color: var(--text-light);
+                              cursor: pointer;
+                              font-size: 14px;
+                              transition: color 0.3s ease;
+                    }
+
+                    .nav-right button:hover {
+                              color: var(--accent-light);
+                    }
+
+                    .logo {
+                              font-weight: 700;
+                              font-size: 20px;
+                              letter-spacing: 2px;
+                              background: linear-gradient(90deg, var(--accent), var(--accent-light));
+                              -webkit-background-clip: text;
+                              -webkit-text-fill-color: transparent;
+                    }
+
+                    /* ======= TOGGLE MENU ======= */
+                    .sidebar {
+                              position: fixed;
+                              top: 0;
+                              left: -260px;
+                              width: 260px;
+                              height: 100vh;
+                              background: rgba(15, 15, 20, 0.95);
+                              backdrop-filter: blur(12px);
+                              box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+                              padding: 100px 20px;
+                              transition: 0.4s ease;
+                              z-index: 200;
+                    }
+
+                    .sidebar.active {
+                              left: 0;
+                    }
+
+                    .sidebar a {
+                              display: block;
+                              padding: 12px 0;
+                              color: var(--text-light);
+                              text-decoration: none;
+                              transition: color 0.3s ease;
+                    }
+
+                    .sidebar a:hover {
+                              color: var(--accent);
+                    }
+
+                    /* ======= HERO SECTION ======= */
+                    .hero {
+                              display: flex;
+                              flex-direction: column;
+                              align-items: center;
+                              justify-content: center;
+                              height: 100vh;
+                              text-align: center;
+                              padding: 100px 20px 0;
+                    }
+
+                    .hero h1 {
+                              font-family: 'Playfair Display', serif;
+                              font-size: clamp(60px, 18vw, 180px);
+                              font-weight: 900;
+                              letter-spacing: 10px;
+
+                              /* 👇 Your inside-text animation image */
+                              background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80");
+
+
+
+                              /* <— replace this with your file name or path */
+                              background-size: 200% auto;
+                              background-position: 0 50%;
+                              background-repeat: repeat;
+                              -webkit-background-clip: text;
+                              -webkit-text-fill-color: transparent;
+
+                              animation: moveBG 30s linear infinite;
+                              margin-bottom: 10px;
+                    }
+
+
+
+                    /* subtle continuous motion */
+                    @keyframes moveBG {
+                              0% {
+                                        background-position: 0% 50%;
+                              }
+
+                              50% {
+                                        background-position: 100% 50%;
+                              }
+
+                              100% {
+                                        background-position: 0% 50%;
+                              }
+                    }
+
+
+                    .hero p {
+                              font-size: 16px;
+                              color: var(--text-muted);
+                              max-width: 600px;
+                    }
+
+                    /* ======= TOP VENDORS SECTION ======= */
+                    section.vendors {
+                              max-width: 1200px;
+                              margin: 0 auto;
+                              padding: 80px 20px 100px;
+                    }
+
+                    section.vendors h2 {
+                              font-family: 'Playfair Display', serif;
+                              font-size: 30px;
+                              font-weight: 700;
+                              text-align: center;
+                              margin-bottom: 50px;
+                    }
+
+                    .vendor-grid {
+                              display: grid;
+                              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                              gap: 30px;
+                    }
+
+                    .vendor-card {
+                              position: relative;
+                              border-radius: 18px;
+                              overflow: hidden;
+                              background: var(--card-bg);
+                              cursor: pointer;
+                              transition: transform 0.4s ease, box-shadow 0.4s ease;
+                    }
+
+                    .vendor-card:hover {
+                              transform: translateY(-8px);
+                              box-shadow: 0 12px 30px rgba(127, 94, 255, 0.3);
+                    }
+
+                    .vendor-card img {
+                              width: 100%;
+                              height: 260px;
+                              object-fit: cover;
+                              transition: transform 0.4s ease;
+                    }
+
+                    .vendor-card:hover img {
+                              transform: scale(1.08);
+                    }
+
+                    .vendor-info {
+                              position: absolute;
+                              bottom: 0;
+                              left: 0;
+                              right: 0;
+                              padding: 20px;
+                              background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
+                    }
+
+                    .vendor-info h3 {
+                              font-size: 18px;
+                              font-weight: 600;
+                              margin-bottom: 6px;
+                    }
+
+                    .vendor-info p {
+                              font-size: 14px;
+                              color: var(--text-muted);
+                    }
+
+                    .vendor-info span {
+                              background: var(--accent);
+                              padding: 4px 10px;
+                              border-radius: 10px;
+                              font-size: 12px;
+                              font-weight: 600;
+                    }
+
+                    /* ======= FOOTER ======= */
+                    footer {
+                              text-align: center;
+                              padding: 30px 0;
+                              color: var(--text-muted);
+                              font-size: 13px;
+                              border-top: 1px solid rgba(255, 255, 255, 0.05);
+                    }
+          </style>
+</head>
+
+<body>
+
+          <!-- ======= NAVBAR ======= -->
+          <nav>
+                    <div class="menu-toggle" id="menuToggle">&#9776;</div>
+
+                    <div class="search-bar">
+                              <input type="text" placeholder="Search vendors, categories..." id="searchInput">
+                    </div>
+
+                    <div class="nav-right">
+                              <button id="SignupBtn">Login</button>
+                              <button id="loginBtn">Login</button>
+                              <button id="helpBtn">Help</button>
+                              <div class="logo">PixOra</div>
+                    </div>
+          </nav>
+
+          <!-- ======= SIDEBAR MENU ======= -->
+          <div class="sidebar" id="sidebar">
+                    <a href="#">Home</a>
+                    <a href="#">Vendors</a>
+                    <a href="#">FAQ</a>
+
+          </div>
+
+          <!-- ======= HERO SECTION ======= -->
+          <section class="hero">
+                    <h1>PIXORA</h1>
+                    <p>Discover photographers & videographers who inspire creativity.</p>
+          </section>
+
+          <!-- ======= TOP VENDORS SECTION ======= -->
+          <section class="vendors">
+                    <h2>Top Rated Vendors</h2>
+                    <div class="vendor-grid" id="vendorGrid">
+                              <div class="vendor-card">
+                                        <img src="download.jfif" alt="Luma Studios">
+
+                                        <div class="vendor-info">
+                                                  <h3>Luma Studios</h3>
+                                                  <p>Weddings & Portraits</p>
+                                                  <span>4.9★</span>
+                                        </div>
+                              </div>
+                              <div class="vendor-card">
+                                        <img src="image.jfif" alt="FrameCraft">
+                                        <div class="vendor-info">
+                                                  <h3>FrameCraft</h3>
+                                                  <p>Candid & Commercial</p>
+                                                  <span>4.8★</span>
+                                        </div>
+                              </div>
+                              <div class="vendor-card">
+                                        <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?w=1200&q=60"
+                                                  alt="Silver Lens">
+                                        <div class="vendor-info">
+                                                  <h3>Silver Lens</h3>
+                                                  <p>Events & Films</p>
+                                                  <span>4.7★</span>
+                                        </div>
+                              </div>
+                    </div>
+          </section>
+
+          <!-- ======= FOOTER ======= -->
+          <footer>
+
+                    © 2025 PixOra — Designed for innovation & creativity.
+          </footer>
+
+          <!-- ======= JS ======= -->
+          <script>
+                    const menuToggle = document.getElementById('menuToggle');
+                    const sidebar = document.getElementById('sidebar');
+                    menuToggle.addEventListener('click', () => {
+                              sidebar.classList.toggle('active');
+                    });
+
+                    document.getElementById('loginBtn').addEventListener('click', () => {
+                              alert("Login functionality coming soon!");
+                    });
+
+                    document.getElementById('helpBtn').addEventListener('click', () => {
+                              alert("Help section coming soon!");
+                    });
+          </script>
+
+</body>
+
+</html>
