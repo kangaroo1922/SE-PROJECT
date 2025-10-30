@@ -9,23 +9,38 @@ vendors = db["vendor_credentials"]
 
 @app.route('/')
 def home():
-    return render_template('vendorSignUp.html')
+    return render_template('home.html')
+@app.route('/aboutUs')
+def aboutUs():
+    return render_template('aboutUs.html')
+@app.route('/faq')
+def faq():
+    return render_template('FAQ.html')
+@app.route('/userLogin')
+def userLogin():
+    return render_template('userLogin.html')
 
-@app.route('/vendorSignUp', methods=['POST'])
+
+@app.route('/vendorSignUp' , methods=['POST' , 'GET'])
 def vendor_signup():
-    userName = request.form.get('userName')
-    password = request.form.get('password')
-    confirm = request.form.get('confirm')
+    if request.method == 'GET':
+        return render_template('vendorSignUp.html', message=None)
+    if request.method == 'POST':
+        print("FUNCTION CALLED")
+        userName = request.form.get('userName')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+        print("GOT THE DATA")
+        if not userName or not password or not confirm:
+            return render_template('vendorSignUp.html', message="⚠️ Please fill in all fields.")
+        if password != confirm:
+            return render_template('vendorSignUp.html', message="⚠️ Passwords do not match.")
+        if vendors.find_one({"userName": userName}):
+            return render_template('vendorSignUp.html', message=f"⚠️ Vendor '{userName}' already exists!")
+        print("checking...")
 
-    if not userName or not password or not confirm:
-        return render_template('vendorSignUp.html', message="⚠️ Please fill in all fields.")
-    if password != confirm:
-        return render_template('vendorSignUp.html', message="⚠️ Passwords do not match.")
-    if vendors.find_one({"userName": userName}):
-        return render_template('vendorSignUp.html', message=f"⚠️ Vendor '{userName}' already exists!")
-
-    vendors.insert_one({"userName": userName, "password": password})
-    return render_template('vendorSignUp.html', message=f"✅ Vendor '{userName}' registered successfully!")
+        vendors.insert_one({"userName": userName, "password": password})
+    return render_template('vendorSignUp.html', message=None)
 
 
 @app.route('/vendorLogin' , methods=['GET' ,'POST'])

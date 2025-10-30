@@ -178,18 +178,18 @@ h1{
                 <button id = "menuButton">&#9881;</button>
                 <h1>PixOra</h1>
                 <div id="slidebar">
-                    <a href="#">Home</a>
+                    <a href="{{url_for('home')}}">Home</a>
                     <a href="#" id = "dropDown">Login</a>
-                    <a href="#">Register</a>
-                    <a href="#">About Us</a>
+                    <a href="{{url_for('faq')}}">FAQ</a>
+                    <a href="{{url_for('aboutUs')}}">About Us</a>
                     <a href="#">Reviews</a>
                     <a href="#" id = "dropDown1">Sign Up</a>
                 </div>
             </div>
              <div id = "submenu">
-                        <a href="#">User Login</a>
+                        <a href="{{url_for('userLogin')}}">User Login</a>
                         <a href="#">Admin Login</a>
-                        <a href="#">Vendor Login</a>
+                        <a href="{{url_for('vendor_login')}}">Vendor Login</a>
             </div>
              <div id = "submenu1">
                         <a href="#">User Signup</a>
