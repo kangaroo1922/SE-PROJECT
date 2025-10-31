@@ -13,7 +13,7 @@
 
    body {
   color: #e6eef8;
-  background: url('{{url_for("static", filename="back.jpg")}}') no-repeat center center fixed;
+  background: url('{{url_for("static", filename="nightSky.jpeg")}}') no-repeat center center fixed;
   background-size: cover;
 
 }
@@ -234,7 +234,7 @@
                         <a href="{{url_for('vendor_login')}}">Vendor Login</a>
             </div>
              <div id = "submenu1">
-                        <a href="{{url_for('userSignUp')}}">User Signup</a>
+                        <a href="#">User Signup</a>
                         <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
             </div>
 
@@ -244,7 +244,7 @@
         <div class="eye">PO</div>
         <div>
           <h2>PixOra</h2>
-          <h2>Vendor Signup</h2>
+          <h2>User Signup</h2>
           <p class="muted">Join our creator community</p>
         </div>
       </div>
@@ -255,7 +255,7 @@
 
       <div id="msgArea" aria-live="polite"></div>
 
-      <form id="signupForm" action="/vendorSignUp" method="POST">
+      <form id="signupForm" action="/userSignUp" method="POST">
         <div class="form-row">
           <label for="userName">User Name</label>
           <input type="userName" id="userName" name="userName" placeholder="zuha aman" required>
