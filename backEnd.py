@@ -1,16 +1,40 @@
 from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session, redirect, url_for, send_file
 from pymongo import MongoClient
 import gridfs
 from bson import ObjectId
+from flask import Flask, request, render_template, send_file
 import io
 app = Flask(__name__)
-
+app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
 db = client["wholeDB"]
 vendors = db["vendor_credentials"]
 users = db["user_credentials"]
 vendorBio = db["vendor_biodata"]
 fs = gridfs.GridFS(db)
+@app.route("/profile/<vendor_id>")
+def profile(vendor_id):
+    vendor = vendorBio.find_one({"vendor_id": vendor_id})
+    if not vendor:
+        return "Vendor not found", 404
+
+    image_ids = vendor.get("images", [])
+    image_ids = [str(i) for i in image_ids]
+    return render_template("vendorSide.html", vendor=vendor, image_ids=image_ids)
+
+
+@app.route("/image/<image_id>")
+def get_image(image_id):
+    """Return an image from GridFS."""
+    try:
+        image_file = fs.get(ObjectId(image_id))
+        return send_file(io.BytesIO(image_file.read()), mimetype="image/jpeg")
+    except:
+        return "Image not found", 404
+@app.route('/vendorSide')
+def vendorSide():
+    return render_template('vendorSide.html')
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -88,32 +112,58 @@ def vendor_login():
             })
         #checking for the validity of the extracted usernames and passwords
             if vendor_doc:
-            #login successful ho gaya boyss
-                return render_template('vendorPanelUpdateBio.html', message =None)
+                session["vendor_user"] = vendor_doc["userName"]
+                session["vendor_id"] = str(vendor_doc["_id"])
+                return redirect(url_for("vendorPanelUpdateBio"))
+
             else:
                 return render_template('vendorLogin.html', message = "Login failed credentials do not match!")
     return render_template('vendorLogin.html', message=None)
-@app.route('/vendorPanelUpdateBio', methods=['GET' , 'POST'])
+@app.route('/vendorPanelUpdateBio', methods=['GET', 'POST'])
 def vendorPanelUpdateBio():
     if request.method == 'POST':
+        # Ensure vendor is logged in
+        if "vendor_user" not in session:
+            return redirect(url_for("vendor_login"))
+
+        userName = session["vendor_user"]
+        vendor_id = session["vendor_id"]
+
         name = request.form.get('name')
         dob = request.form.get('dob')
         phone = request.form.get('phone')
         about = request.form.get('about')
         files = request.files.getlist('images')
-        print("Number of files receieved: " , len(files))
-        image_ids= []
+
+        image_ids = []
         for file in files:
             if file and file.filename != '':
                 image_id = fs.put(file, filename=file.filename)
                 image_ids.append(str(image_id))
-        vendorBio.insert_one({
-            "full_name":name,
-            "date_of_birth": dob,
-            "phone_number":phone,
-            "about":about,
-            "images":image_ids
-        })
-    return render_template('vendorPanelUpdateBio.html')
+
+        # Replace (not append) vendor bio + images
+        vendorBio.update_one(
+            {"vendor_id": vendor_id},  # each vendor has one bio
+            {
+                "$set": {
+                    "vendor_id": vendor_id,
+                    "userName": userName,
+                    "full_name": name,
+                    "date_of_birth": dob,
+                    "phone_number": phone,
+                    "about": about,
+                    "images": image_ids
+                }
+            },
+            upsert=True
+        )
+
+        return render_template(
+            'vendorPanelUpdateBio.html',
+            message="Profile updated successfully!"
+        )
+
+    return render_template('vendorPanelUpdateBio.html', message=None)
+
 if __name__ == '__main__':
     app.run(debug=True)

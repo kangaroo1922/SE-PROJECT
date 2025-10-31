@@ -361,8 +361,28 @@
                               padding: 8px 0;
                               color: var(--muted)
                     }
+                    .imageSection{
+                      width: 100%;
+                      height: auto;
+                      display: flex;
+                      flex-direction: row;
+                      justify-content: space-around;
+                      padding: 10px;
+                      flex-wrap: wrap;
+                      
+                    }
+                    .imageSection  img{
+                      width: 250px;
+                      height: 250px;
+                      margin: 10px;
+                      transition: 0.4s ;
+                    }
+                    .imageSection > img:hover{
+                      transform: translateY(10px);
+                    }
 
                     @media (max-width: 800px) {
+                              
                               .hero {
                                         flex-direction: column;
                                         align-items: flex-start
@@ -407,9 +427,9 @@
                     </div>
                     <nav class="profile-actions">
                               <button class="ghost">Help</button>
-                              <button class="ghost">Login</button>
+                              <button class="ghost"><a href="{{url_for('home')}}" style="text-decoration: none; color: white;">Logout</a></button>
                               <button class="ghost">Sign Up</button>
-                              <button class="primary">Book Now</button>
+                              <button class="primary"><a href="{{url_for('vendorPanelUpdateBio')}}" style="text-decoration: none; color: white;">Update Profile</a></button>
                     </nav>
           </header>
 
@@ -417,12 +437,13 @@
                     <section class="hero">
                               <div class="hero-left">
                                         <div class="avatar-glass">
-                                                  <img id="vendorAvatar"
-                                                            src="https://placehold.co/300x300/png?text=Vendor"
-                                                            alt="Vendor avatar">
+                                                  {% if image_ids|length > 0 %}
+                                                  <img id="vendorAvatar" src ="{{ url_for('get_image', image_id=image_ids[0]) }}" alt="Portfolio image">
+                                                  {% endif %}
+                                               
                                         </div>
                                         <div class="vendor-meta">
-                                                  <h2 id="vendorName">Weddings</h2>
+                                                  <h2 id="vendorName">{{vendor["full_name"]}}</h2>
                                                   <p id="vendorLocation" class="muted">Lahore, Pakistan • Wedding
                                                             Photographer</p>
                                                   <div class="meta-stats">
@@ -442,8 +463,7 @@
                                                   <button id="shareBtn" class="ghost">Share</button>
                                         </div>
                                         <p id="vendorShort" class="description">
-                                                  Elegant wedding photography, candid and editorial style. Travel
-                                                  available across Pakistan.
+                                                  {{vendor["about"]}}
                                         </p>
                               </div>
                     </section>
@@ -454,14 +474,32 @@
                               <button data-tab="reviews" class="tab">Reviews</button>
                               <div class="tab-ink"></div>
                     </section>
+                    <div class="imageSection">
+                            {% if image_ids|length > 0 %}
+                             <img  src ="{{ url_for('get_image', image_id=image_ids[1]) }}" alt="Portfolio image">
+                            {% endif %}
+                            {% if image_ids|length > 0 %}
+                            <img  src ="{{ url_for('get_image', image_id=image_ids[2]) }}" alt="Portfolio image">
+                            {% endif %}
+                            {% if image_ids|length > 0 %}
+                             <img  src ="{{ url_for('get_image', image_id=image_ids[3]) }}" alt="Portfolio image">
+                            {% endif %}
+                            {% if image_ids|length > 0 %}
+                            <img  src ="{{ url_for('get_image', image_id=image_ids[4]) }}" alt="Portfolio image">
+                            {% endif %}
+                            {% if image_ids|length > 0 %}
+                            <img  src ="{{ url_for('get_image', image_id=image_ids[5]) }}" alt="Portfolio image">
+                            {% endif %}
 
+                    </div>
                     <section class="content">
                               <div id="images" class="pane active">
-                                        <div class="gallery-grid" id="gallery"></div>
+                                  
                               </div>
 
                               <div id="packages" class="pane">
                                         <div class="packages-grid" id="packagesGrid"></div>
+                              
                               </div>
 
                               <div id="reviews" class="pane">
@@ -469,13 +507,14 @@
                               </div>
                     </section>
           </main>
+          
 
           <footer class="footer">
                     <small class="muted">© PixOra • Dark chic demo</small>
           </footer>
 
           <script>
-                    const vendor = {
+                    /*const vendor = {
                               name: "Weddings",
                               location: "Lahore, Pakistan",
                               avatar: "https://placehold.co/600x600/png?text=Aisha",
@@ -622,7 +661,7 @@
                               });
                               return { open, close: closeLB };
                     }
-          </script>
+          */</script>
 </body>
 
 </html>

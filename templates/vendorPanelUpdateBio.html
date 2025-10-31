@@ -309,7 +309,7 @@
                 <a href="#" id="close">&#x2715;</a>
                 <a href="#">Logout</a>
                 <a href="#">Update bio</a>
-                <a href="#">View Profile</a>
+                <a href="{{url_for('profile', vendor_id=session.get('vendor_id'))}}">View Profile</a>
             </div>
         </div>
         <h1>PixOra</h1>
