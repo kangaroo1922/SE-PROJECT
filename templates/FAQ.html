@@ -75,17 +75,33 @@
 
                     #slidebar {
                               position: fixed;
-                              top: 0;
-                              left: -250px;
-                              width: 250px;
+                            
+                              left: -100%;
+                              width: 400px;
                               height: 100%;
-                              background: rgba(20, 20, 20, 0.95);
-                              backdrop-filter: blur(10px);
+                              background: none;
+                              justify-content: space-between;
                               display: flex;
-                              flex-direction: column;
+                              flex-direction: row;
                               padding-top: 100px;
                               transition: left 0.4s ease;
-                              z-index: 1001;
+                              
+                    }
+                    #slidebar > a{
+                    
+                         text-decoration: none;
+                              color: white;
+                              border-radius: 8px;
+                              transition: background 0.3s ease;
+                    }
+                     #slidebar  > a:hover{
+                        background-color: #7f5eff;
+                        color: #7f5eff;
+                    }
+                    #slidebar.active{
+                        left:0;
+                        margin-left: 250px;
+                        margin-bottom: 120px;
                     }
 
                     /* Submenus */
@@ -94,17 +110,18 @@
                               display: flex;
                               flex-direction: column;
                               position: fixed;
-                              top: -100%;
-                              transition: top 0.4s ease;
-                              left: 10%;
                               z-index: 1001;
+                              top: -100%;
+                              margin-left: 10%;
+                              transition: top 0.4s ease;
+                              flex-direction: column;
                     }
 
                     #submenu a,
                     #submenu1 a {
                               text-decoration: none;
                               color: white;
-                              background: rgba(20, 20, 20, 0.85);
+                              background: none;
                               padding: 8px 12px;
                               border-radius: 8px;
                               margin: 4px 0;
@@ -118,7 +135,8 @@
 
                     #submenu.active,
                     #submenu1.active {
-                              top: 90px;
+                              top: 0;
+                              margin-top: 100px;
                     }
 
                     /* === Header === */
@@ -298,10 +316,10 @@
                     <button id="menuButton">&#9881;</button>
                     <h1>PixOra</h1>
                     <div id="slidebar">
-                              <a href="#">Home</a>
+                              <a href="{{url_for('home')}}">Home</a>
                               <a href="#" id="dropDown">Login</a>
-                              <a href="#">Register</a>
-                              <a href="#">About Us</a>
+                              <a href="{{url_for('faq')}}">FAQ</a>
+                              <a href="{{url_for('aboutUs')}}">About Us</a>
                               <a href="#">Reviews</a>
                               <a href="#" id="dropDown1">Sign Up</a>
                     </div>
@@ -309,13 +327,13 @@
 
           <!-- Submenus -->
           <div id="submenu">
-                    <a href="#">User Login</a>
+                    <a href="{{url_for('userLogin')}}">User Login</a>
                     <a href="#">Admin Login</a>
-                    <a href="#">Vendor Login</a>
+                    <a href="{{url_for('vendor_login')}}">Vendor Login</a>
           </div>
           <div id="submenu1">
-                    <a href="#">User Signup</a>
-                    <a href="#">Vendor Signup</a>
+                    <a href="{{url_for('userSignUp')}}">User Signup</a>
+                    <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
           </div>
 
           <!-- Header -->
@@ -424,15 +442,29 @@
                     });
 
                     // Navbar toggle
-                    const button = document.getElementById("menuButton");
-                    const bar = document.getElementById("slidebar");
-                    const submenu = document.getElementById("submenu");
-                    const submenu1 = document.getElementById("submenu1");
+                //from the first file
+                    const button = document.getElementById('menuButton');
+                    const bar = document.getElementById('slidebar');
+                    const drop = document.getElementById('dropDown');
+                    const submenu = document.getElementById('submenu');
+                    const login = document.getElementById('loginButton');
+                    const drop1 = document.getElementById('dropDown1');
+                    const submenu1 = document.getElementById('submenu1');
+                    button.addEventListener('click' , ()=> {
+                        bar.classList.toggle('active');
+                        submenu.classList.remove('active');
+                        submenu1.classList.remove('active');
 
-                    button.addEventListener("click", () => {
-                              bar.classList.toggle("active");
-                              submenu.classList.remove("active");
-                              submenu1.classList.remove("active");
+                    });
+
+                    drop.addEventListener('click' , ()=>{
+                    submenu.classList.toggle('active')
+                    submenu1.classList.remove('active');
+
+                    });
+                    drop1.addEventListener('click' , ()=>{
+                    submenu1.classList.toggle('active')
+                    submenu.classList.remove('active');
                     });
           </script>
 </body>

@@ -1,20 +1,25 @@
 from flask import Flask, request, render_template
 from pymongo import MongoClient
-
+import gridfs
+from bson import ObjectId
+import io
 app = Flask(__name__)
 
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
 db = client["wholeDB"]
 vendors = db["vendor_credentials"]
 users = db["user_credentials"]
-
+vendorBio = db["vendor_biodata"]
+fs = gridfs.GridFS(db)
 @app.route('/')
 def home():
     return render_template('home.html')
 @app.route('/aboutUs')
 def aboutUs():
     return render_template('aboutUs.html')
-
+@app.route('/faq')
+def faq():
+    return render_template('FAQ.html')
 
 @app.route('/userSignUp' , methods=['GET' , 'POST'])
 def userSignUp():
@@ -84,9 +89,30 @@ def vendor_login():
         #checking for the validity of the extracted usernames and passwords
             if vendor_doc:
             #login successful ho gaya boyss
-                return render_template('vendorLogin.html', message = "Login successful!")
+                return render_template('vendorPanelUpdateBio.html', message =None)
             else:
                 return render_template('vendorLogin.html', message = "Login failed credentials do not match!")
     return render_template('vendorLogin.html', message=None)
+@app.route('/vendorPanelUpdateBio', methods=['GET' , 'POST'])
+def vendorPanelUpdateBio():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        dob = request.form.get('dob')
+        phone = request.form.get('phone')
+        about = request.form.get('about')
+        files = request.files.getlist('images')
+        image_ids= []
+        for file in files:
+            if file and file.filename != '':
+                image_id = fs.put(file, filename=file.filename)
+                image_ids.append(str(image_id))
+        vendorBio.insert_one({
+            "full_name":name,
+            "date_of_birth": dob,
+            "phone_number":phone,
+            "about":about,
+            "images":image_ids
+        })
+    return render_template('vendorPanelUpdateBio.html')
 if __name__ == '__main__':
     app.run(debug=True)

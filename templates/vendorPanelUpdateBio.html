@@ -1,283 +1,398 @@
 <!DOCTYPE html>
-<html>
-    <head >
-        <title>UPDATE BIO</title>
-        <link>
-        
-        <style>
-*{
-    margin: 0;
-    text-decoration: none;
-    font-family: sans-serif;
-    padding: 0;
-}
+<html lang="en">
 
-.navbar{
-    height: 180px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width:100%;
-    background: linear-gradient(to top, #000066 0%, #ff3399 100%);
-    color: white;
-    border-radius: 0 0 20% 20%;
-    padding-top: 50px;
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PixOra | Vendor Profile Update</title>
 
-}
-.navbar > h1{
-    width: 50%;
-    height:100%;
-    text-align: right;
-    padding-right: 2%;
-    font-weight: 1;
-}
-.navbar > div{
-    width: 50%;
-    height:100%;
-}
-.menu{
-    display: flex;
-    flex-direction: row;
-    width: 50%;
-    
-}
-#button{
-    width:20%;
-    height:20%;
-    font-size: 30px;
-    background: none;
-    color: white;
-    border: none;
-    margin-left: 2%;
-}
-#slidebar{
-    width: 60%;
-   display: flex;
-   flex-direction:row;
-   flex-wrap: wrap;
-    text-decoration: none;
-    position: fixed;
-    left:-100%;
-    transition: left 0.4s ease;
-    
-}
-#slidebar > a{
-    text-decoration: none;
-    color: white;
-    font-size: 20px;
-    font-weight: 1;
-    padding: 5px;
-}
-#slidebar > a:hover{
-    text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
-#slidebar.active{
-    left:0;
-    margin-left:10%;
-    color: black;
-    font-size: 50;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
 
-#submenu , #submenu1{
-    display: flex;
-    flex-direction: column;
-    top:-100%;
-    position:fixed;
-    transition: top 0.4s ease;
-    margin-left:10% ;
-}
-#submenu > a , #submenu1 > a{
-    color: white;
-    font-size: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding:3px;
-}
-#submenu > a:hover , #submenu1 > a:hover{
-    text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
-#submenu.active , #submenu1.active{
-    font-weight: 1;
-    top:0;
-    margin-left: 10%;
-    margin-top:150px;
-}
+        body {
+            background: radial-gradient(circle at top, #0b0b0d 0%, #1a0b2e 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
 
-#updationForm{
-    width: 70%;
-    text-align: center;
-    margin-left:auto;
-    margin-right: auto;
-    height: auto;
-    margin-top: 50px;
-    background-color: antiquewhite;
-    border-radius: 20px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    justify-content: space-between;
-}
-.biodata,.description, .uploadPics{
-    width: 100%;
-    height:100%;
-    background-color: antiquewhite;
-    text-align: left;
-}
-#description{
-    width: 90%;
-    height: 150px;
-    resize: vertical;
-    display: block;
-    margin: 10px auto 10px auto;
-    border-radius: 20px;
+        /* ===== FLOATING PURPLE GLOW ===== */
+        .floating-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
 
-}
-#preview {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-}
-input[type="file"] {
-    margin-bottom: 20px;
-}
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.15;
+            animation: float 18s ease-in-out infinite;
+        }
 
-.image-box {
-      width: 150px;
-      height: 150px;
-      border: 2px dashed #aaa;
-      border-radius: 10px;
-      overflow: hidden;
-      background-color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-}
-.image-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+        .blob.b1 {
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            left: -100px;
+            background: radial-gradient(circle, #7f5eff, transparent 70%);
+        }
 
-        </style>
+        .blob.b2 {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle, #a17eff, transparent 70%);
+            animation-delay: 6s;
+        }
 
-    </head>
-    
-    <body style="background-color: black;">
-            
-        <div class="navbar">
-         <div class = "menu">
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(40px, -40px);
+            }
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 40px;
+            background: rgba(15, 15, 25, 0.7);
+            backdrop-filter: blur(12px);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar h1 {
+            font-family: "Playfair Display", serif;
+            font-weight: 700;
+            font-size: 28px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #ffffff, #c5c5c5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu button:hover {
+            color: #a17eff;
+            transform: rotate(90deg);
+        }
+
+        /* ===== SIDEBAR ===== */
+        #slidebar {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 260px;
+            height: 100vh;
+            background: rgba(20, 15, 40, 0.95);
+            padding: 100px 20px;
+            transition: 0.4s ease;
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(127, 94, 255, 0.2);
+            z-index: 20;
+        }
+
+        #slidebar.active {
+            left: 0;
+        }
+
+        #slidebar a {
+            display: block;
+            color: #fff;
+            margin: 15px 0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        #slidebar a:hover {
+            color: #a17eff;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 120px 20px 80px;
+            background: linear-gradient(to bottom, #0b0b0d 40%, #1a0b2e 100%);
+            overflow: hidden;
+            z-index: 3;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("download.jfif");
+            /* 👈 add your image here */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.25;
+            /* adjust visibility */
+            z-index: 1;
+        }
+
+        .hero h2 {
+            position: relative;
+            z-index: 2;
+            font-size: clamp(40px, 8vw, 80px);
+            font-family: "Playfair Display", serif;
+            font-weight: 900;
+            color: white;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            position: relative;
+            z-index: 2;
+            color: #bcbcbc;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            position: relative;
+            z-index: 5;
+            max-width: 900px;
+            margin: 60px auto 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(127, 94, 255, 0.3);
+            color: white;
+        }
+
+        h1,
+        h2 {
+            color: #ffffff;
+            font-family: "Playfair Display", serif;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: 500;
+            color: #c5c5c5;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            margin-bottom: 20px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            box-shadow: 0 0 10px rgba(127, 94, 255, 0.6);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* ===== IMAGE PREVIEW ===== */
+        #preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .image-box {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(127, 94, 255, 0.1);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ===== SAVE BUTTON ===== */
+        .save-btn {
+            display: block;
+            width: 200px;
+            margin: 40px auto 0;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(90deg, #2c0434, #41054b);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(127, 94, 255, 0.3);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(161, 126, 255, 0.6);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: relative;
+            z-index: 5;
+            text-align: center;
+            padding: 40px 0;
+            font-size: 14px;
+            color: #c5c5c5;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Purple Glow -->
+    <div class="floating-bg">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="menu">
             <button id="button">&#9881;</button>
-             <div id="slidebar">
-                    <a href="#">View Profile And Orders</a>
-                    <a href="#">Logout</a>
-                    <a href="#">Update Bio</a>
-                    <a href="#">Reviews</a>
-                </div>
+            <div id="slidebar">
+                <a href="#" id="close">&#x2715;</a>
+                <a href="#">Logout</a>
+                <a href="#">Update bio</a>
+                <a href="#">View Profile</a>
             </div>
-             <h1>PixOra</h1>  
-
         </div>
-            <div id = "submenu">
-                        <a href="#">User Login</a>
-                        <a href="#">Admin Login</a>
-                        <a href="#">Vendor Login</a>
+        <h1>PixOra</h1>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h2>Edit your Profile</h2>
+        <p>Showcase your work, tell your story, and let clients discover your talent.</p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <h1>Update Your Profile</h1>
+        <form id = "biodataForm" action="/vendorPanelUpdateBio" method="POST">
+        <div class="biodata">
+            <h2>Your Bio Information</h2>
+
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name = "name" placeholder="Your Name" />
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phone" placeholder="+92..." />
         </div>
-            <div id = "submenu1">
-                        <a href="#">User Signup</a>
-                        <a href="#">Vendor Signup</a>
-            </div>
 
-           <div id="updationForm" action="/vendorSignUp" method="POST">
-                <h1>Update your Profile</h1>
+        <div class="description">
+            <h2>About You</h2>
+            <textarea id="description" name = "about" placeholder="Describe your services, experience, and expertise..."></textarea>
+        </div>
 
-                <div class="biodata">
-                    <h2>Enter your bio data</h2>
-                     <label for="name">Enter your full name </label>
-                    <input type="text" id = "name" placeholder="name">
-                   
-                    <label for="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob" required>
-                    
-                    <label for="phone">Enter your phone number: </label>
-                    <input type="tel" id = "phoneNumber" name = "phone">
-
-                </div>
-
-                <div class="description">
-                    <h2>Enter your description</h2>
-                    <textarea name="description" id="description"></textarea>
-                </div>
-
-                <div class="uploadPics">
-                    <h2>Upload your Pictures</h2>
-                    <input type="file" id="fileInput" accept="image/*" multiple>
-                    <div id="preview"></div>
-                </div>
-                <div class="submission">
-                    <button>SUBMIT</button>
-                </div>
-
-           </div>
-
-          
-                
+        <div class="uploadPics">
+            <h2>Upload Your Portfolio Pictures</h2>
+            <input type="file" id="fileInput" name="images"  multiple required/>
+            <div id="preview"></div>
+        </div>
         
-           <script>
+        <!-- Save Button -->
+        <button class="save-btn" type="submit">Save Profile</button>
+        </form>
+    </div>
 
-document.addEventListener('DOMContentLoaded', () => {
-  const fileInput = document.getElementById('fileInput');
-  const preview = document.getElementById('preview');
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2025 PixOra — Empowering Creative Vendors.</p>
+    </footer>
 
-  fileInput.addEventListener('change', () => {
-    //preview.innerHTML = ''; // clear previous previews
-    const files = fileInput.files;
+    <!-- JAVASCRIPT -->
+    <script>
+        // Image Preview Function
+        document.addEventListener("DOMContentLoaded", () => {
+            const fileInput = document.getElementById("fileInput");
+            const preview = document.getElementById("preview");
 
-    for (const file of files) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const div = document.createElement('div');
-        div.classList.add('image-box');
-        div.innerHTML = `<img src="${e.target.result}" alt="Vendor photo">`;
-        preview.appendChild(div);
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-});
+            fileInput.addEventListener("change", () => {
+                const files = fileInput.files;
+                preview.innerHTML = "";
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement("div");
+                        div.classList.add("image-box");
+                        div.innerHTML = `<img src="${e.target.result}" alt="Vendor photo">`;
+                        preview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
 
-const button = document.getElementById('button');
-const bar = document.getElementById('slidebar');
-const submenu = document.getElementById('submenu');
-const drop = document.getElementById('dropDown');
-const submenu1 = document.getElementById('submenu1');
-const drop1 = document.getElementById('dropDown1');
-button.addEventListener('click' , ()=>{
-    bar.classList.toggle('active');
-    submenu.classList.remove('active');
-    submenu1.classList.remove('active');
-});
-drop.addEventListener('click' , ()=>{
-    submenu.classList.toggle('active');
-    submenu1.classList.remove('active');
+        // Sidebar Toggle
+        const button = document.getElementById("button");
+        const bar = document.getElementById("slidebar");
+        const hide = document.getElementById("close");
 
-});
-drop1.addEventListener('click' , ()=>{
-    submenu1.classList.toggle('active');
-    submenu.classList.remove('active');
-});
-
-
-
-
-           </script>
-    </body>
+        button.addEventListener("click", () => {
+            bar.classList.toggle("active");
+        });
+        hide.addEventListener("click", ()=> {
+            bar.classList.remove("active");
+        });
+        // Save button alert placeholder
+        document.querySelector(".save-btn").addEventListener("click", () => {
+            alert("Profile saved successfully (frontend only). Backend connection coming soon!");
+        });
+    </script>
+</body>
 
 </html>
