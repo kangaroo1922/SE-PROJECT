@@ -101,6 +101,7 @@ def vendorPanelUpdateBio():
         phone = request.form.get('phone')
         about = request.form.get('about')
         files = request.files.getlist('images')
+        print("Number of files receieved: " , len(files))
         image_ids= []
         for file in files:
             if file and file.filename != '':

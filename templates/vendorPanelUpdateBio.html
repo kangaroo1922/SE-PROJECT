@@ -236,21 +236,26 @@
             gap: 15px;
             justify-content: center;
         }
+        input[type="file"] {
+             margin-bottom: 20px;
+            }
 
-        .image-box {
-            width: 150px;
-            height: 150px;
-            border-radius: 10px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(127, 94, 255, 0.1);
-        }
-
-        .image-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.image-box {
+      width: 150px;
+      height: 150px;
+      border: 2px dashed #aaa;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+.image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
         /* ===== SAVE BUTTON ===== */
         .save-btn {
@@ -319,7 +324,7 @@
     <!-- MAIN CONTENT -->
     <div class="container">
         <h1>Update Your Profile</h1>
-        <form id = "biodataForm" action="/vendorPanelUpdateBio" method="POST">
+        <form id = "biodataForm" action="/vendorPanelUpdateBio" method="POST" enctype="multipart/form-data">
         <div class="biodata">
             <h2>Your Bio Information</h2>
 
@@ -340,7 +345,7 @@
 
         <div class="uploadPics">
             <h2>Upload Your Portfolio Pictures</h2>
-            <input type="file" id="fileInput" name="images"  multiple required/>
+            <input type="file" id="fileInput" name="images"  multiple/>
             <div id="preview"></div>
         </div>
         
@@ -363,7 +368,7 @@
 
             fileInput.addEventListener("change", () => {
                 const files = fileInput.files;
-                preview.innerHTML = "";
+               // preview.innerHTML = "";
                 for (const file of files) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -388,10 +393,7 @@
         hide.addEventListener("click", ()=> {
             bar.classList.remove("active");
         });
-        // Save button alert placeholder
-        document.querySelector(".save-btn").addEventListener("click", () => {
-            alert("Profile saved successfully (frontend only). Backend connection coming soon!");
-        });
+
     </script>
 </body>
 
