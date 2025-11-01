@@ -307,7 +307,7 @@
             <button id="button">&#9881;</button>
             <div id="slidebar">
                 <a href="#" id="close">&#x2715;</a>
-                <a href="#">Logout</a>
+                <a href="{{url_for('home')}}">Logout</a>
                 <a href="#">Update bio</a>
                 <a href="{{url_for('profile', vendor_id=session.get('vendor_id'))}}">View Profile</a>
             </div>

@@ -76,10 +76,35 @@ def userLogin():
             "password":password
         })
         if user_doc:
-            return render_template('userLogin.html' , message="Login successful")
+            session["client_name"] = user_doc["userName"]
+            session["client_id"] = str(user_doc["_id"])
+            return redirect(url_for('clientside'))
         else:
             return render_template('userLogin.html', message="Login failed, incorrect password or username")
     return render_template('userLogin.html' , message=None)
+
+
+@app.route('/clientside' , methods=['GET' , 'POST'])
+def clientside():
+    return render_template('clientside.html',message=None)
+
+
+@app.route('/getContent/<vendorId>')
+def getContent(vendorId):
+    vendor = vendorBio.find_one({"_id": ObjectId(vendorId)})
+    imageIds = vendor.get("images" , [])
+    imageIds = [str(i) for i in imageIds]
+    return render_template('clientside.html' , vendor = vendor, imageIds=imageIds)
+
+
+@app.route('/search', methods=['GET' , 'POST'])
+def search():
+    searchString = request.form.get("query")
+    name = vendorBio.find_one({"full_name":searchString})
+    if not name:
+        return redirect(url_for('clientside'))
+    return redirect(url_for('getContent',vendorId=str(name["_id"])))
+
 
 @app.route('/vendorSignUp' , methods=['GET', 'POST'])
 def vendor_signup():
