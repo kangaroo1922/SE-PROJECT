@@ -158,6 +158,9 @@ def vendorPanelUpdateBio():
         dob = request.form.get('dob')
         phone = request.form.get('phone')
         about = request.form.get('about')
+        package1 = request.form.get('package1')
+        package2 = request.form.get('package2')
+        package3 = request.form.get('package3')
         files = request.files.getlist('images')
 
         image_ids = []
@@ -177,6 +180,9 @@ def vendorPanelUpdateBio():
                     "date_of_birth": dob,
                     "phone_number": phone,
                     "about": about,
+                    "package1": package1,
+                    "package2": package2,
+                    "package3": package3,
                     "images": image_ids
                 }
             },

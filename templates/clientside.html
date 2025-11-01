@@ -233,7 +233,7 @@
                    text-align: center;
                     border: none;
                     border-radius: 25px;
-                    background: linear-gradient(90deg, #2c0434, #41054b);
+                    background: hsl(252, 56%, 24%);
                     color: white;
                     font-size: 16px;
                     font-weight: 400;
@@ -249,6 +249,7 @@
                             #bookNow:hover {
                         transform: translateY(-2px);
                         box-shadow: 0 0 30px rgba(161, 126, 255, 0.6);
+                        background: #41054b;
                             }
                     #bookNow > a{
                         color: white;
@@ -384,6 +385,66 @@
                               font-size: 13px;
                               border-top: 1px solid rgba(255, 255, 255, 0.05);
                     }
+
+
+                    .packageSection{
+
+                                margin-top: 20px;
+                                align-self: center;
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                flex: wrap;
+                                flex-direction: row;
+                                justify-content: space-around;
+                    }
+                    .packageSection > div {
+                      background: linear-gradient(90deg, #2c0434, #41054b);
+                      border-radius: 10px;
+                      padding: 5px;
+                      margin: 10px;
+                        font-family: sans-serif;
+                        font-size: medium;
+                    }
+                    .packageSection > div:hover{
+                         background: 
+                        linear-gradient(#0a0c10, #0a0c10) padding-box,
+                        linear-gradient(135deg, #00ccff, #9146ff, #00ffaa) border-box;
+                        transform: translateY(-30px);
+                        transition: transform 1s ease-out, opacity 1s ease-out;
+                      border: 1px solid #3700ff;
+                       box-shadow: 0 0 20px 4px rgba(145, 70, 255, 0.6);
+                    }
+                    .packageSection > div > h2{
+                      font-weight: 200;
+                      font-size: medium;
+                      padding-top: 10px;
+                      text-align: center;
+                    }
+                    .packageSection > div > h1{
+                      text-align: center;
+                      font-size: 30px;
+                      font-weight: 200;
+                    }
+                    @media (max-width: 1200px){
+                      
+                      .packageSection{
+                        width: 30%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content:space-between;
+            
+                        flex-wrap: wrap;
+                        align-self: center;
+                        margin-left: auto;
+                        margin-right: auto;
+                       
+                      }
+                      .packageSection > div{
+                        margin-top: 20px;
+                        
+                      }
+                    }
           </style>
 </head>
 
@@ -421,6 +482,7 @@
                     <div class="left">
                     <h1>{{vendor.full_name}}</h1>
                     <h2>{{vendor.date_of_birth}}</h2>
+                    <h2>{{vendor.phone_number}}</h2>
                     <p>{{vendor.about}}</p>
                     </div>
                      <img src="{{url_for('get_image', image_id=imageIds[0]) }}" alt="">
@@ -432,7 +494,23 @@
                     <img src="{{url_for('get_image', image_id=imageIds[4]) }}" alt="">
                     <img src="{{url_for('get_image', image_id=imageIds[5]) }}" alt="">
                 </div>
-                <div id = "bookNow"><a href="#">BOOK THIS VENDOR</a></div>
+                <div class="packageSection">
+                    <div class="package1">
+                          <h1>Bronze Package</h1>
+                          <h2>One album for RS.{{vendor.package1}}</h2>
+                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                      </div>
+                      <div class="package2">
+                          <h1>Platinum Package</h1>
+                          <h2>Two album for RS.{{vendor.package2}}</h2>
+                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                      </div>
+                      <div class="package3">
+                          <h1>Gold Package</h1>
+                          <h2>Three album for RS.{{vendor.package3}}</h2>
+                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                      </div>
+                </div>
             </div>
 
          {% endif %}

@@ -318,6 +318,38 @@
                               margin-top: 8px;
                               font-size: 13px
                     }
+                    .packageSection{
+
+                                margin-top: 20px;
+                                align-self: center;
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                flex: wrap;
+                                flex-direction: row;
+                                justify-content: space-between;
+                    }
+                    .packageSection > div {
+                      background-color: hsl(265, 87%, 26%);
+                      border-radius: 10px;
+                      padding: 5px;
+              
+                    }
+                    .packageSection > div:hover{
+                         background: 
+                        linear-gradient(#0a0c10, #0a0c10) padding-box,
+                        linear-gradient(135deg, #00ccff, #9146ff, #00ffaa) border-box;
+                        transform: translateY(-30px);
+                        transition: transform 1s ease-out, opacity 1s ease-out;
+                      border: 1px solid #3700ff;
+                       box-shadow: 0 0 20px 4px rgba(145, 70, 255, 0.6);
+                    }
+                    .packageSection > div > h2{
+                      font-weight: 400;
+                    }
+                    .packageSection > div > h1{
+                      text-align: center;
+                    }
 
                     .package .cta {
                               margin-top: 12px;
@@ -415,6 +447,23 @@
                               .profile-actions.active {
                                         display: flex;
                               }
+                              
+                    }
+                    @media (max-width: 1200px){
+                      
+                      .packageSection{
+                        width: 30%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content:space-between;
+            
+                        flex-wrap: wrap;
+                        align-self: center;
+                       
+                      }
+                      .packageSection > div{
+                        margin-top: 20px;
+                      }
                     }
           </style>
 </head>
@@ -492,6 +541,26 @@
                             {% endif %}
 
                     </div>
+                    {% if vendor %}
+
+                    <h1 style="text-align: center; margin-top: 20px;">PACKAGES</h1>
+                    <div class="packageSection" >
+                      <div class="package1">
+                          <h1>Bronze Package</h1>
+                          <h2>One album for RS.{{vendor.package1}}</h2>
+                      </div>
+                      <div class="package2">
+                          <h1>Platinum Package</h1>
+                          <h2>Two album for RS.{{vendor.package2}}</h2>
+                      </div>
+                      <div class="package3">
+                          <h1>Gold Package</h1>
+                          <h2>Three album for RS.{{vendor.package3}}</h2>
+                      </div>
+
+                    </div>
+
+                    {% endif %}
                     <section class="content">
                               <div id="images" class="pane active">
                                   
