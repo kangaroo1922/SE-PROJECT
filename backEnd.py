@@ -5,6 +5,7 @@ import gridfs
 from bson import ObjectId
 from flask import Flask, request, render_template, send_file
 import io
+from bson.errors import InvalidId
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
@@ -117,10 +118,10 @@ def allVendors():
 
     return render_template("clientside.html", vendors=allVendors)
 
-@app.route('/bookingpanel' , methods = ['GET' , 'POST'])
+
+@app.route('/bookingpanel', methods=['GET', 'POST'])
 def booking_details():
-    if request.method == 'GET':
-        return render_template('bookingpanel.html', message=None)
+    # --- PART 1: SAVING THE DATA (POST) ---
     if request.method == 'POST':
         vendor_id = request.form.get('vendor_id')
         fullName = request.form.get('name')
@@ -131,26 +132,78 @@ def booking_details():
         cardNumber = request.form.get('cardNumber')
         expiry = request.form.get('expiry')
         cvv = request.form.get('cvv')
-        userName = session.get("userName")
-        id = str(session.get("_id"))
-        userOrder = db['order_details']
-        userOrder.insert_one({
-                "fullName":fullName,
-                "chosenVendorId": vendor_id,
-                "userName":userName,
-                "user id":id,
-                "contact":contact,
-                "description":description,
-                "date":date,
-                "address":address,
-                "cardNumber":cardNumber,
-                "expiry": expiry,
-                "cvv": cvv
-
-        })
-        return render_template('bookingpanel.html', message="Booking submitted successfully!", vendor={"_id": vendor_id})
-
         
+        # Helper to get session data safely
+        userName = session.get("client_name")
+        user_id = session.get("client_id")
+
+        if not userName:
+            return redirect(url_for('userLogin'))
+
+        # Insert the order
+        db['order_details'].insert_one({
+            "fullName": fullName,
+            "chosenVendorId": vendor_id,
+            "userName": userName,
+            "user_id": user_id,
+            "contact": contact,
+            "description": description,
+            "date": date,
+            "address": address,
+            "cardNumber": cardNumber,
+            "expiry": expiry,
+            "cvv": cvv
+        })
+        
+        # Retrieve vendor for the success page (Safe Lookup)
+        try:
+            current_vendor = vendorBio.find_one({"_id": ObjectId(vendor_id)})
+        except InvalidId:
+            # Fallback: Try searching by the custom string 'vendor_id'
+            current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
+
+        return render_template('bookingpanel.html', message="Booking submitted successfully!", vendor=current_vendor)
+
+    # --- PART 2: LOADING THE PAGE (GET) ---
+    else:
+        vendor_id_from_url = request.args.get('vendor_id')
+        
+        if not vendor_id_from_url:
+            return "Error: No vendor ID provided in URL. Please go back and select a vendor."
+
+        # --- THE FIX: Robust ID Lookup ---
+        try:
+            # 1. First try to find by the MongoDB ObjectId
+            target_vendor = vendorBio.find_one({"_id": ObjectId(vendor_id_from_url)})
+        except InvalidId:
+            # 2. If that crashes, it's likely a custom string ID or dirty data.
+            #    Try searching by the "vendor_id" field instead.
+            target_vendor = vendorBio.find_one({"vendor_id": vendor_id_from_url})
+        
+        # 3. If still not found, the ID is garbage
+        if not target_vendor:
+            return f"Error: Vendor with ID '{vendor_id_from_url}' not found in database.", 404
+
+        return render_template('bookingpanel.html', vendor=target_vendor)    
+# ... existing code ...
+@app.route('/vendorDashboard')
+def vendorDashboard():
+    # 1. Security Check
+    if 'vendor_id' not in session:
+        return redirect(url_for('vendor_login'))
+
+    current_vendor_id = session['vendor_id']
+
+    # 2. Query the 'order_details' collection
+    # Fetch orders for this vendor, sorted by newest date first
+    my_orders = list(db['order_details'].find(
+        {"chosenVendorId": current_vendor_id}
+    ).sort("date", -1))
+
+    # 3. Render the dashboard
+    return render_template('vendorDashboard.html', orders=my_orders)
+
+
 
 @app.route('/vendorSignUp' , methods=['GET', 'POST'])
 def vendor_signup():

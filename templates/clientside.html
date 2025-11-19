@@ -538,17 +538,17 @@
                     <div class="package1">
                           <h1>Bronze Package</h1>
                           <h2>One album for RS.{{vendor.package1}}</h2>
-                          <div id = "bookNow"><a href="{{url_for('bookingpanel', vendor_id = vendor._id)}}">BOOK NOW</a></div>
+                          <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor._id }}">BOOK NOW</a></div>
                       </div>
                       <div class="package2">
                           <h1>Platinum Package</h1>
                           <h2>Two album for RS.{{vendor.package2}}</h2>
-                          <div id = "bookNow"><a href="{{url_for('bookingpanel', vendor_id = vendor._id)}}">BOOK NOW</a></div>
+                          <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor._id }}">BOOK NOW</a></div>
                       </div>
                       <div class="package3">
                           <h1>Gold Package</h1>
                           <h2>Three album for RS.{{vendor.package3}}</h2>
-                          <div id = "bookNow"><a href="{{url_for('bookingpanel', vendor_id = vendor._id)}}">BOOK NOW</a></div>
+                          <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor._id }}">BOOK NOW</a></div>
                       </div>
                 </div>
             </div>
@@ -561,6 +561,7 @@
           <section class="hero">
                     <h1>PIXORA</h1>
                     <p>Discover photographers & videographers who inspire creativity.</p>
+
 
           </section>
 
