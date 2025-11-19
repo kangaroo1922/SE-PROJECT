@@ -1,377 +1,439 @@
 <html>
-    <head>
-        <title>About Us</title>
 
-<style>
-*{
-    margin: 0;
-    text-decoration: none;
-    font-family: sans-serif;
-    padding: 0;
-    color: white;
-}
+<head>
+    <title>About Us</title>
 
-body{
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-}
-.navbar{
-    width:100%;
-    height: auto;
-    background: linear-gradient(to top, #030633  0% , #0914B5 100%);
-    border-radius: 0 0 20% 20%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    color: white;
-    padding-bottom: 50px;
-}
-.navbar > .menu{
-    width: 50%;
-    height: 100%;
-    padding-top: 1.5%;
-     display: flex;
-    flex-direction: row;
-    align-items: start;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: "Poppins", sans-serif;
+            color: white;
+        }
 
-.menu > #button{
-    font-size: 30px;
-    background:none;
-    border: 0;
-    color: white;
-    margin-left: 2%;
-    width: 50%;
-    text-align: left;
-    padding-top: 5px;
-}
-.menu > #slidebar{
-    position: fixed;
-    left: -100%;
-    transition: left 0.4s ease;
-    padding-top: 0.5%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    width:50%;
-}
-#slidebar > a{
-    padding: 5px;
-    text-align: center;
-    margin-left: 10px;
-   text-decoration: none;
-   font-size: 20;
-   font-weight: 2;
-}
-#slidebar > a:hover{
-     text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
+        body {
+            background-color: #ebe7f0;
+            background-image: url('download.jfif');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-#slidebar.active{
-    left:0;
-    margin-left: 70px;
-}
-.navbar > h1{
-    width: 50%;
-    height: 100%;
-    text-align: right;
-    font-weight: 1;
-    margin-right: 2%;
-    padding-top: 1.5%;
-}
-#submenu , #submenu1{
-    display: flex;
-    flex-direction: column;
-    top:-100%;
-    position:fixed;
-    transition: top 0.4s ease;
-    margin-left:70px;
-}
-#submenu > a:hover , #submenu1 > a:hover{
-    text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
-#submenu > a, #submenu1 > a{
-    text-decoration: none;
-    color: white;
+        /* NAVBAR */
+        .navbar {
+            width: 100%;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    border-radius: 15px;
-    padding: 5px;
-    text-align: center;
-}
-#submenu.active , #submenu1.active{
-    font-weight: 1;
-    top:0;
-    margin-left: 70px;
-    margin-top:150px;
-}
-.container{
-    width:100%;
-    height: 100%;
-    background-color: black;
-    border-radius: 10%;
-    background: linear-gradient(to bottom ,#030633 0%,#0914B5 100%);
-     background-image: url('/static/userBack.jpg');
-   background-repeat: no-repeat;
-   background-size: cover;
-    align-self: stretch;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-}
-.rafay , .zuha, .minhal{
-    height: auto;
-    width: 80%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    
-    align-self: center;
-    margin: 20px 10px 20px 20px;
-}
-.rafayPic > h1, .minhalPic > h1, .zuhaPic > h1{
-    font-weight: 1;
-}
-.zuha > * , .rafay > *, .minhal > *{
-    width: 50%;
-    text-align: center;
-    font-weight: 1;
-}
-.info > p{
-    margin-top: 50px;
-    text-align: justify;
-    font-size: 20px;
-}
-.info > h1{
-    font-weight: 1;
-}
-.rafayPic > img{
-    height: 200px;
-    width: 200px;
-    border-radius: 60%;
-}
-.rafayPic > img:hover{
-    height: 300px;
-    width: 300px;
-    transition-delay: 0.1s;
-}
-.minhalPic > img{
-    height: 200px;
-    width: 200px;
-    border-radius: 50%;
-}
-.minhalPic > img:hover{
-    height: 300px;
-    width: 300px;
-    transition-delay: 0.1s;
-}
-.zuhaPic > img{
-    height: 200px;
-    width: 220px;
-    border-radius: 50%;
-}
-.zuhaPic > img:hover{
-    height: 300px;
-    width: 300px;
-    transition-delay: 0.1s;
-}
+        .navbar h1 {
+            font-weight: 300;
+            font-size: 28px;
+            letter-spacing: 3px;
+            color: #b399ff;
+            text-transform: uppercase;
+        }
 
-.minhal , .rafay , .zuha{
-    border:1px solid white;
-    border-top: 0px;
-    border-radius: 0 0 20px 20px;
-}
-.subContainer2{
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    margin: 20px;
-}
-.subContainer2  h1{
-    font-weight: 1;
-    text-align: center;
-}
-.vision, .mission , .values{
-    height: 100%;
-    border-radius: 10px 40% 10px 10px;
-    background: linear-gradient(to bottom, hsl(231, 98%, 20%) 10%, #11bbda 100%);
-}
-.para > p{
-    height: 100%;
-    background: linear-gradient(to bottom, #11bbda 0%, hsl(231, 98%, 20%));
-    margin-left: 20px;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 20px;
-    font-weight: 1;
-}
-.para > p:hover{
-    transform: translateY(50px);
-    transition: transform 1s ease-out, opacity 1s ease-out;
-}
-@media (max-width:1231px) {
-    .subContainer2{
-        display: flex;
-        flex-direction: column;
-        width: 50%;
-        align-self:center;
-    }
-    .vision,.mission,.values{
-        margin-bottom:10%;
-    }
-    .para > p:hover{
-    transform: translateY(30px);
-    transition: transform 1s ease-out, opacity 1s ease-out;
-}
-    
-}
-.subContainer2 p{
-    text-align: justify;
-    padding: 20px 20px 0 20px;
-}
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-.footer{
-    width:100%;
-    height: 15%;
-    flex-shrink: 0;
-    background-color: black;
-    background: linear-gradient(to bottom, black  20% , #0914B5 100%);
-    border-radius: 20% 20% 0 0;
-}
+        #button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
 
-</style>
-    </head>
+        #button:hover {
+            transform: rotate(90deg);
+        }
 
-    <body>
-        <div class="navbar">
-            <div class = "menu">
-                <button id="button">&#9881;</button>
-                <div id="slidebar">
-                    <a href="{{url_for('home')}}">Home</a>
-                    <a href="#" id = "dropDown">Login</a>
-                    <a href="{{url_for('faq')}}">FAQ</a>
-                    <a href="{{url_for('aboutUs')}}">About Us</a>
-                    <a href="#">Reviews</a>
-                    <a href="#" id = "dropDown1">Sign Up</a>
+        #slidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            height: 100vh;
+            width: 250px;
+            background: rgba(10, 10, 25, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.5s ease;
+            z-index: 100;
+        }
+
+        #slidebar.active {
+            left: 0;
+        }
+
+        #slidebar a {
+            color: #cbb4ff;
+            padding: 12px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #slidebar a:hover {
+            color: white;
+            background: rgba(119, 0, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 80vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 80px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 200;
+            margin-top: 10px;
+            color: #dcdcdc;
+            letter-spacing: 3px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            /* background: rgba(208, 208, 208, 0.85);*/
+            backdrop-filter: blur(10px);
+            padding: 70px 80px;
+            margin: 80px auto;
+            border-radius: 0;
+            /* no rounded edges */
+            width: 85%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(183, 183, 183, 0.3);
+            animation: fadeUp 1.2s ease;
+        }
+
+        .container h1 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-weight: 300;
+            font-size: 40px;
+            margin-bottom: 40px;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        /* VISION, MISSION, VALUES */
+        .subContainer2 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .vision,
+        .mission,
+        .values {
+            flex: 1 1 300px;
+            padding: 40px;
+            background: rgba(133, 126, 140, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s ease;
+            box-shadow: 0 0 20px rgba(100, 0, 150, 0.2);
+        }
+
+        .vision:hover,
+        .mission:hover,
+        .values:hover {
+            transform: translateY(-10px);
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 30px rgba(86, 68, 103, 0.4);
+        }
+
+        .vision h1,
+        .mission h1,
+        .values h1 {
+            color: #ffffff;
+            text-align: center;
+            font-weight: 400;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .para p {
+            margin-top: 10px;
+            font-size: 17px;
+            color: #ffffff;
+            text-align: justify;
+            line-height: 1.7;
+        }
+
+        /* TEAM SECTION */
+        h1.section-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            margin-top: 80px;
+            color: #ffffff;
+            font-size: 86px;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+        }
+
+        .rafay,
+        .minhal,
+        .zuha {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 70px auto;
+            padding: 50px;
+            background: rgba(213, 195, 231, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(115, 76, 134, 0.3);
+            border-radius: 0;
+            width: 85%;
+            transition: all 0.5s ease;
+        }
+
+        .rafay:hover,
+        .minhal:hover,
+        .zuha:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 35px rgba(185, 128, 232, 0.224);
+        }
+
+        .rafayPic img,
+        .minhalPic img,
+        .zuhaPic img {
+            border-radius: 0;
+            /* Square, clean edges */
+            width: 180px;
+            height: 220px;
+            object-fit: cover;
+            filter: grayscale(40%);
+            transition: all 0.6s ease;
+        }
+
+        .rafayPic img:hover,
+        .minhalPic img:hover,
+        .zuhaPic img:hover {
+            filter: grayscale(0);
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(180, 140, 255, 0.6);
+        }
+
+        .info {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .info h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            color: #333333;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .info p {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            color: #333333;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        /* FOOTER */
+        .footer {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 20, 0.9);
+            border-top: 1px solid #929094;
+            margin-top: 100px;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .rafay,
+            .minhal,
+            .zuha {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .rafayPic,
+            .minhalPic,
+            .zuhaPic {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="menu">
+            <button id="button">&#9881;</button>
+            <div id="slidebar">
+                <a href="{{url_for('home')}}">Home</a>
+                <a href="#" id="dropDown">Login</a>
+                <a href="{{url_for('faq')}}">FAQ</a>
+                <a href="{{url_for('aboutUs')}}">About Us</a>
+                <a href="#">Reviews</a>
+                <a href="#" id="dropDown1">Sign Up</a>
+            </div>
+        </div>
+        <h1>PixOra</h1>
+    </div>
+
+    <div class="hero">
+        <h1>ABOUT US</h1>
+        <h2>CAPTURING THE UNSEEN</h2>
+    </div>
+
+    <div class="container">
+        <h1>Our Vision, Mission & Values</h1>
+        <div class="subContainer2">
+            <div class="vision">
+                <h1>Our Vision</h1>
+                <div class="para">
+                    <p>We envision a world where finding the right photographer is as easy as a single click...</p>
                 </div>
             </div>
-            <h1>Pixora</h1>
 
+            <div class="mission">
+                <h1>Our Mission</h1>
+                <div class="para">
+                    <p>Our mission is to make professional photography accessible, simple, and effortless for
+                        everyone...</p>
+                </div>
+            </div>
+
+            <div class="values">
+                <h1>Our Values</h1>
+                <div class="para">
+                    <p>At the heart of our platform are values that guide everything we do — creativity, trust, and
+                        excellence...</p>
+                </div>
+            </div>
         </div>
-     <div id = "submenu">
-                        <a href="{{url_for('userLogin')}}">User Login</a>
-                        <a href="#">Admin Login</a>
-                        <a href="{{url_for('vendor_login')}}">Vendor Login</a>
     </div>
-    <div id = "submenu1">
-                        <a href="{{url_for('userSignUp')}}">User Signup</a>
-                        <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
+
+    <h1 class="section-title">The DEVENGERS</h1>
+
+    <div class="rafay">
+        <div class="rafayPic">
+
+            <img src="rafay.jpeg" alt="">
+        </div>
+        <div class="info">
+            <h1>About Rafay</h1>
+            <p>Abdul Rafay is a passionate Cybersecurity student with a strong foundation in programming languages
+                such as C++, HTML, CSS, and JavaScript. With experience in web development and a keen eye for detail,
+                he plays a crucial role in ensuring the seamless integration of various components within the project.
+                Rafay's dedication to learning and problem-solving makes him an invaluable asset to the team.</p>
+        </div>
     </div>
 
-        <div class="container">
-                <h1 style="font-weight: 1; text-align: center; margin-top: 20px; font-size: 40px; margin-bottom: 20px;">ABOUT US</h1>
-                <div class="subContainer2">
-                    <div class="vision">
-                        <h1>Our Vision</h1>
-                        <div class="para"><p>We envision a world where finding the right photographer is as easy as a single click. Our platform aspires to become the leading destination for creative professionals and clients alike — a place where artistry meets convenience. We are committed to building a community that values creativity, trust, and collaboration, empowering photographers to showcase their work and clients to discover visual storytellers who bring their ideas to life.</p></div>
-                    </div>
-                    <div class="mission">
-                        <h1>Our Mission</h1>
-                        <div class="para">
-                        <p>Our mission is to make professional photography accessible, simple, and effortless for everyone. We strive to connect talented photographers with people who want to capture life’s most meaningful moments — from weddings and events to portraits and creative projects. By offering a seamless booking experience, transparent pricing, and verified professionals, we aim to help users focus on what matters most: enjoying the moment while we take care of the rest.</p>
-                    </div>
-                    </div>
-                    
-                    <div class="values">
-                        <h1>Our Values</h1>
-                        <div class="para">
-                            <p>At the heart of our platform are values that guide everything we do — creativity, trust, and excellence. We celebrate artistic expression and individuality while maintaining a standard of quality that ensures every shoot exceeds expectations. We believe in transparent communication, respect for our clients and photographers, and delivering memorable experiences through genuine connections and beautiful imagery.</p>
-                        </div>
-                    </div>
-
-                </div>
-                <h1 style="font-weight: 1; text-align: center; margin-top: 10%; font-size: 40px;">THE DEVENGERS</h1>
-                <div class="rafay">
-                    <div class="rafayPic">
-                        <h1>Meet Rafay</h1>
-                        <img src="/static/rafay.jpeg" alt="">
-                    </div>
-                    <div class="info">
-                        <h1>About Rafay</h1>
-                        <p style="padding-right: 20px;">Abdul Rafay is a cybersecurity student skilled in programming languages, including HTML, CSS, JavaScript, Java, and C++. Proficient in the Bootstrap framework, he specializes in creating responsive grid layouts. With practical experience in web development, he is passionate about contributing to back-end functionality and ensuring robust, scalable project outcomes.</p>
-                    </div>
-                </div>
-                
-                <div class="minhal">
-                    <div class="info">
-                        <h1>About Mihal</h1>
-                        <p style="padding-left: 20px; padding-bottom: 10px;">Minhal Hassan is a dedicated Cybersecurity enthusiast recognized for her outstanding academic achievements and strong technical expertise. Skilled in software development using diverse frameworks, tools, and programming languages, including HTML, CSS, and Java, she continuously seeks to expand her knowledge and embrace emerging technologies to drive innovation and excellence.  </p>
-                    </div>
-                    <div class="minhalPic">
-                        <h1>Meet Minhal</h1>
-                        <img src="/static/minhal.jpg" alt="">
-                    </div>
-
-                </div>
-                <div class="zuha">
-                    <div class="zuhaPic">
-                        <h1>Meet Zuha</h1>
-                        <img src="/static/zuha.jpg" alt="">
-                    </div>
-                    <div class="info">
-                        <h1>About Zuha</h1>
-                        <p style="padding-right: 20px;">Zuha Aman is a cybersecurity student proficient in C++, HTML, CSS, and JavaScript. With experience in web design, she applies both technical expertise and creative problem-solving to guide the overall structure and direction of the project. She ensures that all components are well-integrated, efficient, and aligned with innovative outcomes.</p>
-                    </div>
-
-                </div>
-
-            
-
+    <div class="minhal">
+        <div class="info">
+            <h1>About Minhal</h1>
+            <p>Minhal Hassan is a dedicated Cybersecurity enthusiast recognized for her outstanding academic
+                achievements and strong technical expertise. Skilled in software development using diverse frameworks,
+                tools, and programming languages, including HTML, CSS, and Java, she continuously seeks to expand her
+                knowledge and embrace emerging technologies to drive innovation and excellence. </p>
         </div>
+        <div class="minhalPic">
 
-        <div class="footer">
-            
-
+            <img src="minhal.jpg" alt="">
         </div>
-<script>
+    </div>
 
-//from the first file
-const button = document.getElementById('button');
-const bar = document.getElementById('slidebar');
-const drop = document.getElementById('dropDown');
-const submenu = document.getElementById('submenu');
-const login = document.getElementById('loginButton');
-const drop1 = document.getElementById('dropDown1');
-const submenu1 = document.getElementById('submenu1');
-button.addEventListener('click' , ()=> {
-    bar.classList.toggle('active');
-    submenu.classList.remove('active');
-    submenu1.classList.remove('active');
+    <div class="zuha">
+        <div class="zuhaPic">
 
-});
+            <img src="zuha.jpg" alt="">
+        </div>
+        <div class="info">
+            <h1>About Zuha</h1>
+            <p>Zuha Aman is a cybersecurity student proficient in C++, HTML, CSS, and JavaScript. With experience in web
+                design, she applies both technical expertise and creative problem-solving to guide the overall structure
+                and direction of the project. She ensures that all components are well-integrated, efficient, and
+                aligned with innovative outcomes.</p>
+        </div>
+    </div>
 
-drop.addEventListener('click' , ()=>{
-submenu.classList.toggle('active')
-submenu1.classList.remove('active');
+    <div class="footer"></div>
 
-});
-drop1.addEventListener('click' , ()=>{
-submenu1.classList.toggle('active')
-submenu.classList.remove('active');
-});
+    <script>
+        const button = document.getElementById('button');
+        const bar = document.getElementById('slidebar');
+        button.addEventListener('click', () => {
+            bar.classList.toggle('active');
+        });
+    </script>
+</body>
 
-
-
-
-</script>
-    </body>
 </html>

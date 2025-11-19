@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Booking Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1a0e2c;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgb(255, 255, 255);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      background: #2c1952;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #5c398d;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .error-msg {
+      color: red;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .success-msg {
+      color: green;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Booking Info </h2>
+
+  <label>Name</label>
+  <input type="text" id="name" placeholder="Enter your full name" />
+
+  <label>Contact Info</label>
+  <input type="text" id="contact" placeholder="Email or phone number" />
+
+  <label>Order Description</label>
+  <textarea id="description" placeholder="Describe your order"></textarea>
+
+  <label>Date</label>
+  <input type="date" id="date" />
+
+  <label>Venue Address</label>
+  <input type="text" id="address" placeholder="Enter venue address" />
+
+  <label>Payment Method</label>
+  <select id="paymentMethod">
+    <option value="cash">Cash</option>
+    <option value="card">Card (charged after approval)</option>
+  </select>
+
+  <div id="cardInfo" class="hidden">
+    <label>Card Number</label>
+    <input type="text" id="cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" />
+
+    <label>Expiration Date</label>
+    <input type="month" id="expiry" />
+
+    <label>CVV</label>
+    <input type="text" id="cvv" placeholder="123" />
+  </div>
+
+  <button onclick="submitBooking()">Submit Booking Request</button>
+
+  <p id="message"></p>
+</div>
+
+<script>
+  // Mock vendor bookings for demonstration
+  const bookedDates = ["2025-11-20", "2025-11-22"]; // Already booked
+
+  document.getElementById("paymentMethod").addEventListener("change", function () {
+    const cardInfo = document.getElementById("cardInfo");
+    if (this.value === "card") {
+      cardInfo.classList.remove("hidden");
+    } else {
+      cardInfo.classList.add("hidden");
+    }
+  });
+
+  function submitBooking() {
+    const name = document.getElementById("name").value;
+    const contact = document.getElementById("contact").value;
+    const description = document.getElementById("description").value;
+    const date = document.getElementById("date").value;
+    const address = document.getElementById("address").value;
+    const paymentMethod = document.getElementById("paymentMethod").value;
+    const message = document.getElementById("message");
+
+    if (!name || !contact || !description || !date || !address) {
+      message.textContent = "Please fill all required fields.";
+      message.className = "error-msg";
+      return;
+    }
+
+    if (bookedDates.includes(date)) {
+      message.textContent = "Vendor is already booked on this date. Please choose another date or vendor.";
+      message.className = "error-msg";
+      return;
+    }
+
+    // If payment is card, validate minimal fields
+    if (paymentMethod === "card") {
+      const cardNum = document.getElementById("cardNumber").value;
+      const expiry = document.getElementById("expiry").value;
+      const cvv = document.getElementById("cvv").value;
+
+      if (!cardNum || !expiry || !cvv) {
+        message.textContent = "Please fill card details.";
+        message.className = "error-msg";
+        return;
+      }
+    }
+
+    // Pretend to send request to vendor
+    message.textContent = "Booking request sent! Awaiting vendor approval...";
+    message.className = "success-msg";
+  }
+</script>
+
+</body>
+</html>
