@@ -1,379 +1,322 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-   <style>
-    *{
-    margin: 0;
-    text-decoration: none;
-    font-family: sans-serif;
-    padding: 0;
-}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PixOra - Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-.navbar{
-    height: 15%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width:100%;
-    background: linear-gradient(to top, #000066 0%, #ff3399 100%);
-    color: white;
-    border-radius: 0 0 20% 20%;
-    padding-top: 50px;
-}
-.navbar > h1{
-    width: 50%;
-    height:100%;
-    text-align: right;
-    padding-right: 2%;
-    font-weight: 1;
-}
-.navbar > div{
-    width: 50%;
-    height:100%;
-}
-.menu{
-    display: flex;
-    flex-direction: row;
-    width: 50%;
-    
-}
-#button{
-    width:20%;
-    height:20%;
-    font-size: 30px;
-    background: none;
-    color: white;
-    border: none;
-    margin-left: 2%;
-}
-#slidebar{
-    width: 60%;
-   display: flex;
-   flex-direction:row;
-   flex-wrap: wrap;
-    text-decoration: none;
-    position: fixed;
-    left:-100%;
-    transition: left 0.4s ease;
-    
-}
-#slidebar > a{
-    text-decoration: none;
-    color: white;
-    font-size: 20;
-    font-weight: 1;
-    padding: 5px;
-}
-#slidebar > a:hover{
-    text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
-#slidebar.active{
-    left:0;
-    margin-left:10%;
-    color: black;
-}
-#submenu , #submenu1{
-    display: flex;
-    flex-direction: column;
-    top:-100%;
-    position:fixed;
-    transition: top 0.4s ease;
-    margin-left:10% ;
-}
-#submenu > a , #submenu1 > a{
-    color: white;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding:3px;
-}
-#submenu > a:hover , #submenu1 > a:hover{
-    text-decoration: none;
-    color: white;
-    background-color: gray;
-    border-radius: 15px;
-}
-#submenu.active , #submenu1.active{
-    font-weight: 1;
-    top:0;
-    margin-left: 10%;
-    margin-top:150px;
-}
+        body {
+            background: #0a0a0f;
+            color: white;
+            overflow-x: hidden;
+        }
 
-.body{
-    height:100%;
-    width: 100%;
-    background:black;
-    
-}
+        /* NAVBAR */
+        .navbar {
+            height: 15%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+            background: linear-gradient(to top, #6c6c747c 0%, #6c6c747c 100%);
+            color: white;
+            padding-top: 50px;
+        }
 
-.container{
-    width:100%;
-    height: 85%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-   
-}
-.subcontainer1, .subcontainer2, .subcontainer3{
-    width: 100%;
-    height: auto;
+        .navbar>h1 {
+            width: 50%;
+            height: 100%;
+            text-align: right;
+            padding-right: 2%;
+            font-weight: 1;
+        }
 
-    color: white;
-    display: flex;
-    flex-direction: row;
-    padding: 10px;
-    gap :20px;
-    
-}
+        .navbar>div {
+            width: 50%;
+            height: 100%;
+        }
 
-.subcontainer1{
+        .menu {
+            display: flex;
+            flex-direction: row;
+            width: 50%;
 
-    height: 300px;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: self-start;
-    padding-top: 20px;
-}
-.subcontainer1 > *{
-    margin-left: 30%;
-    font-weight: 1;
-}
-.subcontainer2 {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-top: 5%;
-    flex-wrap: wrap;
-    
-}
-.subcontainer2 > *{
+        }
 
-    color: white;
-    width: 400px;
-    height: 400px;
-    border:2px solid #0066ff;
-    border-radius: 12px;
-    transition: border 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
-    text-align: justify;
-    padding: 20px;
-    font-size: large;
-    font-weight: 1;
-    
-}
-.subcontainer2 > *:hover{
+        #button {
+            width: 20%;
+            height: 20%;
+            font-size: 30px;
+            background: none;
+            color: white;
+            border: none;
+            margin-left: 2%;
+        }
 
-      box-shadow: 0 0 20px 4px rgba(145, 70, 255, 0.6);
-    background: 
-    linear-gradient(#0a0c10, #0a0c10) padding-box,
-    linear-gradient(135deg, #00ccff, #9146ff, #00ffaa) border-box;
-    transform: translateY(-30px);
-    transition: transform 1s ease-out, opacity 1s ease-out;
-}
-ul li{
-    margin-top: 10px;
-    margin-left: 5px;
-}
-.subcontainer3{
-    display: flex;
-    flex-direction: column;
+        #slidebar {
+            width: 60%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            text-decoration: none;
+            position: fixed;
+            left: -100%;
+            transition: left 0.4s ease;
 
-}
-.subcontainer3 > h1{
-    font-weight: 1;
-    margin-left: 28%;
+        }
 
-}
+        #slidebar>a {
+            text-decoration: none;
+            color: white;
+            font-size: 20;
+            font-weight: 1;
+            padding: 5px;
+        }
 
-.grids{
-    margin-top: 5%;
-    margin-bottom: 5%;
-    align-self: center;
-    display: grid;
-    grid-template-rows: 150px 150px 150px 150px 150px 150px;
-    grid-template-columns: 200px 200px 200px 200px 200px 200px;
-    gap: 20px;
-   
-}
-@media (max-width:1376px) {
-    .grids{
-        align-self: center;
-        display: grid;
-        grid-template-rows: 100px 100px 100px 100px 100px 100px;
-        grid-template-columns: 150px 150px 150px 150px 150px 150px;
-        gap: 20px; 
-    }
-}
-@media (max-width:1070px) {
-    .grids{
-        align-self: center;
-        display: grid;
-        grid-template-rows: 80px 80px 80px 80px 80px 80px;
-        grid-template-columns: 100px 100px 100px 100px 100px 100px;
-        gap: 20px; 
-    }
-}
-    
-.grids > .img1{
-    background-image: url('/static/home1.jpg');
-    grid-row:1/3;
-    grid-column: 3/7;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-.grids > .img1:hover{
-    transform: translateX(30px);
-    transition: transform 0.4s ease-out, opacity 1s ease-out;;
-}
-.grids > .img2{
-    background-image: url('/static/home2.jpg');
-    grid-row:3/5;
-    grid-column: 3/5;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
+        #slidebar>a:hover {
+            text-decoration: none;
+            color: white;
+            background-color: gray;
+            border-radius: 15px;
+        }
 
-.grids > .img3{
-    background-image: url('/static/home3.jpg');
-    grid-row:1/5;
-    grid-column: 1/3;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-.grids > .img3:hover{
-    transform: translateY(-30px);
-    transition: transform 0.4s ease-out, opacity 1s ease-out;;
-}
-.grids > .img4{
-    background-image: url('/static/home4.jpg');
-    grid-row:3/7;
-    grid-column: 5/7;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-.grids > .img4:hover{
-    transform: translateY(30px);
-    transition: transform 0.4s ease-out, opacity 1s ease-out;;
-}
-.grids > .img5{
-    background-image: url('/static/cato1.jpeg');
-    grid-row:5/7;
-    grid-column: 1/5;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-.grids > .img5:hover{
-    transform: translateX(-30px);
-    transition: transform 0.4s ease-out, opacity 1s ease-out;;
-}
+        #slidebar.active {
+            left: 0;
+            margin-left: 10%;
+            color: black;
+        }
 
+        #submenu,
+        #submenu1 {
+            display: flex;
+            flex-direction: column;
+            top: -100%;
+            position: fixed;
+            transition: top 0.4s ease;
+            margin-left: 10%;
+            z-index: 100;
+        }
+        #submenu a, #submenu1 a {
+        text-decoration: none;
+        }
 
+        #submenu>a,
+        #submenu1>a {
+            color: white;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding: 3px;
+        }
 
-   </style>
+        #submenu>a:hover,
+        #submenu1>a:hover {
+            text-decoration: none;
+            color: white;
+            background-color: gray;
+            border-radius: 15px;
+        }
 
+        #submenu.active,
+        #submenu1.active {
+            font-weight: 1;
+            top: 0;
+            margin-left: 10%;
+            margin-top: 150px;
+        }
 
+        /* HERO */
+        .hero {
+            width: 100%;
+            height: 90vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .hero-content h1 {
+            font-size: 40px;
+            font-weight: 700;
+            line-height: 1.2;
+            z-index: 2;
+        }
+
+        .hero-content span {
+            background: linear-gradient(135deg, #8e3caf, #000000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* INFO CARDS */
+        */ .section {
+            padding: 80px 5%;
+        }
+
+        .info-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .card {
+            width: 330px;
+            padding: 30px;
+            border-radius: 20px;
+            background: #12121a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.5s;
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            border-color: #9146ff;
+            box-shadow: 0 0 25px #9146ff55;
+        }
+
+        .card h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* WORK TITLE */
+        .work-section h1 {
+            text-align: center;
+            margin-bottom: 80px;
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #9161a4, #000000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* GALLERY GRID */
+        .gallery-grid {
+            width: 100%;
+            padding: 60px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            object-fit: cover;
+            height: 230px;
+            border-radius: 0;
+            transition: 0.3s ease;
+        }
+
+        .gallery-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: none;
+        }
+    </style>
 </head>
-<body style="background-color: black;">
+
+<body> <!-- NAVBAR -->
+    <!-- NAVBAR -->
     <div class="navbar">
-        <div class = "menu">
+        <div class="menu">
             <button id="button">&#9881;</button>
-             <div id="slidebar">
-                    <a href="{{url_for('home')}}">Home</a>
-                    <a href="#" id = "dropDown">Login</a>
-                    <a href="{{url_for('faq')}}">FAQ</a>
-                    <a href="{{url_for('aboutUs')}}">About Us</a>
-                    <a href="#">Reviews</a>
-                    <a href="#" id = "dropDown1">Sign Up</a>
-                </div>
+            <div id="slidebar">
+                <a href="{{url_for('home')}}">Home</a>
+                <a href="#" id="dropDown">Login</a>
+                <a href="{{url_for('faq')}}">FAQ</a>
+                <a href="{{url_for('aboutUs')}}">About Us</a>
+                <a href="#">Reviews</a>
+                <a href="#" id="dropDown1">Sign Up</a>
+            </div>
         </div>
         <h1>PixOra</h1>
-        
-    </div>
-     <div id = "submenu">
-                        <a href="{{url_for('userLogin')}}">User Login</a>
-                        <a href="#">Admin Login</a>
-                        <a href="{{url_for('vendor_login')}}">Vendor Login</a>
-    </div>
-    <div id = "submenu1">
-                        <a href="{{url_for('userSignUp')}}">User Signup</a>
-                        <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
-    </div>
-    
-    <div class="container">
-        <div class="bg" style="background: linear-gradient(to bottom,  black 0%, #000066 70%, black 100%);">
-        <div class = "subcontainer1">
-            <h1 style="margin-top: 2.5%; font-size: 50;">Everything</h1>
-            <h1>You need to know about</h2>
-            <h1>PixOra...</h2>
+    </div> <!-- SUBMENUS -->
+    <div id="submenu"> <a href="{{url_for('userLogin')}}">User Login</a> <a href="./adminPanel.html">Admin Login</a> <a
+            href="{{url_for('vendor_login')}}">Vendor Login</a> </div>
+    <div id="submenu1"> <a href="{{url_for('userSignUp')}}">User Signup</a> <a
+            href="{{url_for('vendor_signup')}}">Vendor Signup</a> </div> <!-- HERO -->
+    <div class="hero"> <video class="hero-bg" autoplay muted loop playsinline>
+            <source src="../static/vid.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Everything You Need To Know About <br><span>PixOra...</span></h1>
         </div>
-        <div class="subcontainer2">
-            <div class="para1">
-                <h2 style="text-align: center; font-weight: 1;">SCOPE</h2>
-                <p style="margin-top: 10%;">Pixora software is a photography and videography service platform designed to connect clients with professional service providers. It aims to offer an assembled and convenient space where people, companies, and event planners can browse, reserve, and oversee photography services easily. The foremost benefits of this system are time savings through faster booking, greater reach for
-service providers, and improved convenience for clients. The goals are to build an efficient
-platform that enables efficient communication, secure transactions, and reliable service delivery.</p>
-            </div>
-            <div class="para2">
-                <h2 style="text-align: center; font-weight: 1;">FOR WHO?</h2>
-                <P style="margin-top:10%;">Pixora is developed for people who want to capture their precious moments in a way that transcends natural human capturing capabilities. It is a standalone proprietary web-based application with no dependencies on other software. It is available for anyone willing to spend a small fortune to capture something upon which one can reminisce. Pixora is a user-friendly platform built by software experts on which multiple professional vendors offer their services at reasonable rates with a complete money-back guarantee and the option to cancel a reservation at any time.
-</P>
-            </div>
-            <div class="para3">
-                <h2 style="text-align: center; font-weight: 1;">FEATURES</h2>
-                <ul style="margin-top: 10%;">
-                    <li>The system will be able to handle multiple concurrent users.</li>
-                    <li>Fast booking and confirmation.</li>
-                    <li>Great quality offered by the vendors.</li>
-                    <li>Money back guarantee.</li>
-                    <li>Offeres people the opportunity to freelance and showcase their talent.</li>
-                    <li>Diligent and effective moderation of the platform incase of any scams.</li>
-                </ul>
+    </div> <!-- INFO CARDS -->
+    <div class="section info-cards">
+        <div class="card">
+            <h2>SCOPE</h2>
+            <p>Pixora connects clients with talented photographers & videographers, making event booking simple, secure
+                and efficient.</p>
+        </div>
+        <div class="card">
+            <h2>FOR WHO?</h2>
+            <p>PixOra serves anyone who wants to preserve memories with professional quality and freedom to choose
+                reliable vendors.</p>
+        </div>
+        <div class="card">
+            <h2>FEATURES</h2>
+            <ul>
+                <li>Handles multiple users</li>
+                <li>Fast booking</li>
+                <li>High quality vendors</li>
+                <li>Money back guarantee</li>
+                <li>Freelancing opportunities</li>
+                <li>Platform moderation</li>
+            </ul>
+        </div>
+    </div> <!-- WORK SECTION TITLE -->
+    <div class="work-section">
+        <h1>Some Of Our Work</h1>
+    </div> <!-- FULLSCREEN CINEMATIC GALLERY -->
+    <!-- STATIC GALLERY -->
+    <div class="gallery-grid">
+        <img src="/static/wow2.jpeg" alt="photo1">
+        <img src="/static/sunrise-mountains.jpg" alt="photo2">
+        <img src="/static/wow3.jpeg" alt="photo3">
+        <img src="/static/wow4.jpeg" alt="photo4">
+        <img src="/static/image.jfif" alt="photo5">
+        <img src="/static/cato.jpeg" alt="photo6">
 
-            </div>
-        </div>
-        </div>
-        <div class="subcontainer3">
-            <h1 style="margin-top: 2.5%; font-size: 40;">Some of our work...</h1>
-            <div class="grids">
-                <div class="img1"></div>
-                <div class="img2"></div>
-                <div class="img3"></div>
-                <div class="img4"></div>
-                <div class="img5"></div>
-                <div class="img6"></div>
-            </div>
-        </div>
+        <img src="/static/nightSky.jpeg" alt="photo7" style="height:260px;">
+        <img src="/static/wow4.jpeg" alt="photo8" style="height:310px;">
+        <img src="/static/sunrise-mountains.jpg" alt="photo9" style="height:310px;">
     </div>
-    <script>
-        const button = document.getElementById('button');
-const bar = document.getElementById('slidebar');
-const submenu = document.getElementById('submenu');
-const drop = document.getElementById('dropDown');
-const submenu1 = document.getElementById('submenu1');
-const drop1 = document.getElementById('dropDown1');
-button.addEventListener('click' , ()=>{
-    bar.classList.toggle('active');
-    submenu.classList.remove('active');
-    submenu1.classList.remove('active');
-});
-drop.addEventListener('click' , ()=>{
-    submenu.classList.toggle('active');
-    submenu1.classList.remove('active');
-
-});
-drop1.addEventListener('click' , ()=>{
-    submenu1.classList.toggle('active');
-    submenu.classList.remove('active');
-});
-
-
-
-
-    </script>
+    <script> const button = document.getElementById('button'); const bar = document.getElementById('slidebar'); const submenu = document.getElementById('submenu'); const drop = document.getElementById('dropDown'); const submenu1 = document.getElementById('submenu1'); const drop1 = document.getElementById('dropDown1'); button.addEventListener('click', () => { bar.classList.toggle('active'); submenu.classList.remove('active'); submenu1.classList.remove('active'); }); drop.addEventListener('click', () => { submenu.classList.toggle('active'); submenu1.classList.remove('active'); }); drop1.addEventListener('click', () => { submenu1.classList.toggle('active'); submenu.classList.remove('active'); }); </script>
 </body>
+
 </html>

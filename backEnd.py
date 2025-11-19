@@ -12,6 +12,7 @@ db = client["wholeDB"]
 vendors = db["vendor_credentials"]
 users = db["user_credentials"]
 vendorBio = db["vendor_biodata"]
+userOrder = db["order_details"]
 fs = gridfs.GridFS(db)
 @app.route("/profile/<vendor_id>")
 def profile(vendor_id):
@@ -89,6 +90,7 @@ def clientside():
     return render_template('clientside.html',message=None)
 
 
+
 @app.route('/getContent/<vendorId>')
 def getContent(vendorId):
     vendor = vendorBio.find_one({"_id": ObjectId(vendorId)})
@@ -104,7 +106,51 @@ def search():
     if not name:
         return redirect(url_for('clientside'))
     return redirect(url_for('getContent',vendorId=str(name["_id"])))
+@app.route('/allVendors', methods=['GET' , 'POST'])
+def allVendors():
+    allVendors = list(vendorBio.find())
 
+    # For each vendor, also load its image IDs
+    for v in allVendors:
+        v["imageIds"] = v.get("images", [])
+
+
+    return render_template("clientside.html", vendors=allVendors)
+
+@app.route('/bookingpanel' , methods = ['GET' , 'POST'])
+def booking_details():
+    if request.method == 'GET':
+        return render_template('bookingpanel.html', message=None)
+    if request.method == 'POST':
+        vendor_id = request.form.get('vendor_id')
+        fullName = request.form.get('name')
+        contact = request.form.get('contact')
+        description = request.form.get('description')
+        date = request.form.get('date')
+        address = request.form.get('address')
+        cardNumber = request.form.get('cardNumber')
+        expiry = request.form.get('expiry')
+        cvv = request.form.get('cvv')
+        userName = session.get("userName")
+        id = str(session.get("_id"))
+        userOrder = db['order_details']
+        userOrder.insert_one({
+                "fullName":fullName,
+                "chosenVendorId": vendor_id,
+                "userName":userName,
+                "user id":id,
+                "contact":contact,
+                "description":description,
+                "date":date,
+                "address":address,
+                "cardNumber":cardNumber,
+                "expiry": expiry,
+                "cvv": cvv
+
+        })
+        return render_template('bookingpanel.html', message="Booking submitted successfully!", vendor={"_id": vendor_id})
+
+        
 
 @app.route('/vendorSignUp' , methods=['GET', 'POST'])
 def vendor_signup():
