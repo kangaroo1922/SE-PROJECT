@@ -124,6 +124,7 @@ def booking_details():
     # --- PART 1: SAVING THE DATA (POST) ---
     if request.method == 'POST':
         vendor_id = request.form.get('vendor_id')
+        chosen_vendor = vendorBio.find_one({"vendor_id":vendor_id})
         fullName = request.form.get('name')
         contact = request.form.get('contact')
         description = request.form.get('description')
@@ -143,7 +144,7 @@ def booking_details():
         # Insert the order
         db['order_details'].insert_one({
             "fullName": fullName,
-            "chosenVendorId": vendor_id,
+            "chosenVendorId": str(chosen_vendor["vendor_id"]),
             "userName": userName,
             "user_id": user_id,
             "contact": contact,
@@ -157,7 +158,7 @@ def booking_details():
         
         # Retrieve vendor for the success page (Safe Lookup)
         try:
-            current_vendor = vendorBio.find_one({"_id": ObjectId(vendor_id)})
+            current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
         except InvalidId:
             # Fallback: Try searching by the custom string 'vendor_id'
             current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
@@ -166,25 +167,11 @@ def booking_details():
 
     # --- PART 2: LOADING THE PAGE (GET) ---
     else:
-        vendor_id_from_url = request.args.get('vendor_id')
-        
-        if not vendor_id_from_url:
-            return "Error: No vendor ID provided in URL. Please go back and select a vendor."
+        vendor_id = request.args.get('vendor_id')
+        current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
 
-        # --- THE FIX: Robust ID Lookup ---
-        try:
-            # 1. First try to find by the MongoDB ObjectId
-            target_vendor = vendorBio.find_one({"_id": ObjectId(vendor_id_from_url)})
-        except InvalidId:
-            # 2. If that crashes, it's likely a custom string ID or dirty data.
-            #    Try searching by the "vendor_id" field instead.
-            target_vendor = vendorBio.find_one({"vendor_id": vendor_id_from_url})
-        
-        # 3. If still not found, the ID is garbage
-        if not target_vendor:
-            return f"Error: Vendor with ID '{vendor_id_from_url}' not found in database.", 404
-
-        return render_template('bookingpanel.html', vendor=target_vendor)    
+    return render_template('bookingpanel.html', vendor=current_vendor)
+   
 # ... existing code ...
 @app.route('/vendorDashboard')
 def vendorDashboard():
@@ -192,16 +179,24 @@ def vendorDashboard():
     if 'vendor_id' not in session:
         return redirect(url_for('vendor_login'))
 
+    # This is the vendor_credentials._id stored as a string
     current_vendor_id = session['vendor_id']
+    print(current_vendor_id)
+    # 3. Fetch orders where chosenVendorId matches vendor_id
+    my_orders = list(
+        db['order_details']
+        .find({"chosenVendorId": current_vendor_id})
+        .sort("date", -1)
+    )
 
-    # 2. Query the 'order_details' collection
-    # Fetch orders for this vendor, sorted by newest date first
-    my_orders = list(db['order_details'].find(
-        {"chosenVendorId": current_vendor_id}
-    ).sort("date", -1))
+    # 4. Render dashboard
+    return render_template(
+        'vendorDashboard.html',
+        orders=my_orders,
+        vendor=current_vendor_id
+    )
 
-    # 3. Render the dashboard
-    return render_template('vendorDashboard.html', orders=my_orders)
+
 
 
 
@@ -270,7 +265,7 @@ def vendorPanelUpdateBio():
 
         # Replace (not append) vendor bio + images
         vendorBio.update_one(
-            {"vendor_id": vendor_id},  # each vendor has one bio
+            {"vendor_id": str(vendor_id),},  # each vendor has one bio
             {
                 "$set": {
                     "vendor_id": vendor_id,

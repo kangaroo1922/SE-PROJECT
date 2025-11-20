@@ -81,7 +81,7 @@
 <div class="container">
   <h2>Booking Info </h2>
   <form action="/bookingpanel" method="POST">
-    <input type="hidden" name="vendor_id" value="{{ vendor['_id'] }}">
+  <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id or '' }}" />
   <label>Name</label>
   <input type="text" id="name" name = "name" placeholder="Enter your full name" />
 
