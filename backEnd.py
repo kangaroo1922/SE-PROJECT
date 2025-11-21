@@ -6,6 +6,7 @@ from bson import ObjectId
 from flask import Flask, request, render_template, send_file
 import io
 from bson.errors import InvalidId
+import bcrypt
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
@@ -14,6 +15,7 @@ vendors = db["vendor_credentials"]
 users = db["user_credentials"]
 vendorBio = db["vendor_biodata"]
 userOrder = db["order_details"]
+admin_collection = db["admin_collection"]
 fs = gridfs.GridFS(db)
 @app.route("/profile/<vendor_id>")
 def profile(vendor_id):
@@ -341,6 +343,42 @@ def vendorPanelUpdateBio():
         )
 
     return render_template('vendorPanelUpdateBio.html', message=None)
+def create_admin():
+    existing = admin_collection.find_one({"username": "admin"})
+    if not existing:
+        hashed_pass = bcrypt.hashpw("admin123".encode('utf-8'), bcrypt.gensalt())
+        admin_collection.insert_one({
+            "username": "admin",
+            "password": hashed_pass
+        })
+        print("Default admin created.")
+    else:
+        print("Admin already exists.")
+@app.route('/adminLogin', methods=['GET', 'POST'])
+def adminLogin():
+    create_admin()
+    if request.method == 'POST':
+        username = request.form.get('userName')
+        password = request.form.get('password')
 
+        admin = admin_collection.find_one({"username": username})
+
+        if admin:
+            # Check password hash
+            if bcrypt.checkpw(password.encode('utf-8'), admin["password"]):
+                session["admin"] = username
+                return redirect(url_for('adminPanel'))
+            else:
+                return render_template('adminLogin.html',
+                                       message="Incorrect password")
+        else:
+            return render_template('adminLogin.html',
+                                   message="Admin user not found")
+
+    return render_template('adminLogin.html')
+@app.route('/adminPanel', methods=['GET' , 'POST'])
+def adminPanel():
+    if request.method == 'GET':
+        return render_template('adminPanel.html')
 if __name__ == '__main__':
     app.run(debug=True)
