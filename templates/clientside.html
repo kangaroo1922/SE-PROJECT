@@ -464,7 +464,7 @@
                     <div class="nav-right">
                             
                               <button id="loginBtn"><a href="{{url_for('home')}}" style="color: white; text-decoration: none;">Logout</a></button>
-                              
+                              <button id="loginBtn"><a href="{{url_for('userDashboard')}}" style="color: white; text-decoration: none;">View your Orders</a></button>
                               <div class="logo">PixOra</div>
                     </div>
           </nav>
@@ -499,19 +499,19 @@
                     <div class="package1">
                           <h1>Bronze Package</h1>
                           <h2>One album for RS.{{vendor.package1}}</h2>
-                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze">BOOK NOW</a>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze&bill={{vendor.package1}}">BOOK NOW</a>
 
                       </div>
                       <div class="package2">
                           <h1>Platinum Package</h1>
                           <h2>Two album for RS.{{vendor.package2}}</h2>
-                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum">BOOK NOW</a>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum&bill={{vendor.package2}}">BOOK NOW</a>
 
                       </div>
                       <div class="package3">
                           <h1>Gold Package</h1>
                           <h2>Three album for RS.{{vendor.package3}}</h2>
-                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold">BOOK NOW</a>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a>
                       </div>
                 </div>
             </div>
@@ -540,17 +540,17 @@
                     <div class="package1">
                           <h1>Bronze Package</h1>
                           <h2>One album for RS.{{vendor.package1}}</h2>
-                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze">BOOK NOW</a></div>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze&bill={{vendor.package1}}">BOOK NOW</a></div>
                       </div>
                       <div class="package2">
                           <h1>Platinum Package</h1>
                           <h2>Two album for RS.{{vendor.package2}}</h2>
-                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum">BOOK NOW</a></div>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum&bill={{vendor.package2}}">BOOK NOW</a></div>
                       </div>
                       <div class="package3">
                           <h1>Gold Package</h1>
                           <h2>Three album for RS.{{vendor.package3}}</h2>
-                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold">BOOK NOW</a></div>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a></div>
                       </div>
                 </div>
             </div>

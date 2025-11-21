@@ -123,6 +123,7 @@ def allVendors():
 def booking_details():
     # --- PART 1: SAVING THE DATA (POST) ---
     if request.method == 'POST':
+        bill = request.form.get('bill')
         vendor_id = request.form.get('vendor_id')
         chosen_vendor = vendorBio.find_one({"vendor_id":vendor_id})
         fullName = request.form.get('name')
@@ -153,7 +154,9 @@ def booking_details():
             "address": address,
             "cardNumber": cardNumber,
             "expiry": expiry,
-            "cvv": cvv
+            "cvv": cvv,
+            "bill":bill,
+            "state":''
         })
         
         # Retrieve vendor for the success page (Safe Lookup)
@@ -163,15 +166,34 @@ def booking_details():
             # Fallback: Try searching by the custom string 'vendor_id'
             current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
 
-        return render_template('bookingpanel.html', message="Booking submitted successfully!", vendor=current_vendor)
+        return render_template('bookingpanel.html', message="Booking submitted successfully! Your total bill is", vendor=current_vendor, bill = bill)
 
     # --- PART 2: LOADING THE PAGE (GET) ---
     else:
         vendor_id = request.args.get('vendor_id')
+        bill = request.args.get('bill')
         current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
 
-    return render_template('bookingpanel.html', vendor=current_vendor)
-   
+    return render_template('bookingpanel.html', vendor=current_vendor, bill=bill)
+@app.route('/updateOrders', methods=['POST'])
+def updateOrders():
+    orders = list(request.form.lists())
+
+    # request.form contains flat data → state_<id>: value
+
+    for key, value in request.form.items():
+        if key.startswith("state_"):
+            order_id = key.replace("state_", "")
+            state = value  # 'accept' or 'reject'
+
+            db['order_details'].update_one(
+                {"_id": ObjectId(order_id)},
+                {"$set": {"state": state}}
+            )
+
+    return redirect(url_for('vendorDashboard'))
+
+
 # ... existing code ...
 @app.route('/vendorDashboard')
 def vendorDashboard():
@@ -181,11 +203,13 @@ def vendorDashboard():
 
     # This is the vendor_credentials._id stored as a string
     current_vendor_id = session['vendor_id']
-    print(current_vendor_id)
     # 3. Fetch orders where chosenVendorId matches vendor_id
     my_orders = list(
         db['order_details']
-        .find({"chosenVendorId": current_vendor_id})
+        .find({"chosenVendorId": current_vendor_id,
+               "state": {"$exists": False}
+               })
+        
         .sort("date", -1)
     )
 
@@ -197,7 +221,35 @@ def vendorDashboard():
     )
 
 
+#route to the user order dashboard
+# route in your backend
+@app.route('/userDashboard', methods=['GET'])
+def userDashboard():
+    userId = session.get('client_id')
+    if not userId:
+        return redirect(url_for('userLogin'))
 
+    # Get all orders for this user
+    my_orders = list(
+        db['order_details']
+        .find({"user_id": userId})
+        .sort("date", -1)
+    )
+
+    # Collect vendor IDs from orders
+    vendor_ids = [o['chosenVendorId'] for o in my_orders if o.get('chosenVendorId')]
+
+    # Convert IDs to proper type depending on your DB
+    # Example: if vendor_id in DB is ObjectId, convert them
+    # vendor_ids = [ObjectId(v) for v in vendor_ids]
+
+    # Fetch all vendor bios matching these IDs
+    vendors_list = list(db['vendor_biodata'].find({"vendor_id": {"$in": vendor_ids}}))
+
+    # Build dict with string keys (for easy lookup in template)
+    vendors_dict = {str(v['vendor_id']): v for v in vendors_list}
+
+    return render_template('userDashboard.html', orders=my_orders, vendors_dict=vendors_dict)
 
 
 @app.route('/vendorSignUp' , methods=['GET', 'POST'])

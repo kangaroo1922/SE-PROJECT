@@ -78,41 +78,59 @@
     <h2>Incoming Orders</h2>
 
     {% if orders %}
+<form action="/updateOrders" method="POST">
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th style="color: black;">Date</th>
-                    <th style="color: black;">Customer Details</th>
-                    <th style="color: black;">Order Info</th>
+                    <th>Date</th>
+                    <th>Customer Details</th>
+                    <th>Order Info</th>
+                    <th>Decision</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
-                    <!-- Column 1: Date -->
                     <td>
-                        <!-- FIX: Changed order.date to order['date'] -->
-                        <strong>{{ order['date']|default('No Date', true) }}</strong>
-                    </td>
-                    
-                    <!-- Column 2: Customer Info -->
-                    <td>
-                        <!-- FIX: Used brackets ['key'] for all fields -->
-                        <b>Name:</b> {{ order['fullName']|default('<span class="empty-data">No Name</span>')|safe }}<br>
-                        <b>Contact:</b> {{ order['contact']|default('<span class="empty-data">No Contact</span>')|safe }}<br>
-                        <b>Address:</b> {{ order['address']|default('<span class="empty-data">No Address</span>')|safe }}
+                        <strong>{{ order['date'] }}</strong>
                     </td>
 
-                    <!-- Column 3: Description -->
                     <td>
-                       {{ order['description']|default('<span class="empty-data">No Description</span>')|safe }}
+                        <b>Name:</b> {{ order['fullName'] }}<br>
+                        <b>Contact:</b> {{ order['contact'] }}<br>
+                        <b>Address:</b> {{ order['address'] }}
+                    </td>
+
+                    <td>
+                        {{ order['description'] }}
+                    </td>
+
+                    <!-- DECISION RADIO BUTTONS -->
+                    <td>
+                        <!-- UNIQUE RADIO NAME = state_<order_id> -->
+                        <input type="hidden" name="order_id" value="{{ order['_id'] }}">
+
+                        <label>
+                            <input type="radio" name="state_{{ order['_id'] }}" value="reject">
+                            Reject
+                        </label>
+
+                        <label>
+                            <input type="radio" name="state_{{ order['_id'] }}" value="accept">
+                            Accept
+                        </label>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <br>
+    <button type="submit" style="padding:10px 20px; text-align: center;">Update Orders</button>
+</form>
+
     {% else %}
         <div style="text-align: center; border: 2px dashed white; padding: 20px;">
             <h3>No active bookings found for your ID.</h3>
