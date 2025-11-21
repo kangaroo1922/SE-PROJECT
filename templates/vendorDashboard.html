@@ -73,7 +73,7 @@
 </head>
 <body>
 
-<div class="container">
+<<div class="container">
     <a href="{{ url_for('vendorPanelUpdateBio') }}" class="btn-back">&#8592; Back to Profile</a>
     <h2>Incoming Orders</h2>
 
@@ -83,44 +83,55 @@
         <table>
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Customer Details</th>
-                    <th>Order Info</th>
-                    <th>Decision</th>
+                    <th style="color: black;">Date</th>
+                    <th style="color: black;">Customer Details</th>
+                    <th style="color: black;">Order Info</th>
+                    <th style="color: black;">Decision</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for order in orders %}
                 <tr>
+
+                    <!-- Column 1: Date -->
                     <td>
-                        <strong>{{ order['date'] }}</strong>
+                        <strong>{{ order['date']|default('No Date', true) }}</strong>
                     </td>
 
+                    <!-- Column 2: Customer Info -->
                     <td>
                         <b>Name:</b> {{ order['fullName'] }}<br>
                         <b>Contact:</b> {{ order['contact'] }}<br>
                         <b>Address:</b> {{ order['address'] }}
                     </td>
 
+                    <!-- Column 3: Order Info -->
                     <td>
-                        {{ order['description'] }}
+                        <b>orderId:</b> {{ order['user_id']|default('<span class="empty-data">No Name</span>')|safe }}<br>
+                        <b>description:</b> {{ order['description']|default('<span class="empty-data">No Contact</span>')|safe }}<br>
+                        <b>Bill:</b> {{ order['bill']|default('<span class="empty-data">No Address</span>')|safe }}<br>
+                        
                     </td>
 
-                    <!-- DECISION RADIO BUTTONS -->
+                    <!-- Column 4: Decision -->
                     <td>
-                        <!-- UNIQUE RADIO NAME = state_<order_id> -->
                         <input type="hidden" name="order_id" value="{{ order['_id'] }}">
+                        <input type="hidden" name="bill_{{ order['_id'] }}" value="{{ order['bill'] }}">
+                        <input type="hidden" name="vendor_{{ order['_id'] }}" value="{{ order['chosenVendorId'] }}">
+
 
                         <label>
                             <input type="radio" name="state_{{ order['_id'] }}" value="reject">
                             Reject
-                        </label>
+                        </label><br>
 
                         <label>
                             <input type="radio" name="state_{{ order['_id'] }}" value="accept">
                             Accept
                         </label>
                     </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -132,12 +143,10 @@
 </form>
 
     {% else %}
-        <div style="text-align: center; border: 2px dashed white; padding: 20px;">
-            <h3>No active bookings found for your ID.</h3>
-        </div>
+    <div style="text-align: center; border: 2px dashed white; padding: 20px;">
+        <h3>No active bookings found for your ID.</h3>
+    </div>
     {% endif %}
-
 </div>
-
 </body>
 </html>

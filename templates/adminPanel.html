@@ -3,679 +3,292 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel — PixOra (Updated)</title>
-
-  <!-- ECharts -->
+  <title>Admin Panel — PixOra</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
   <style>
-    /* ----------------- Base ----------------- */
+    /* ----------------- Base Styles ----------------- */
     *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
     :root{
-      --bg:#07070c;
-      --card: rgba(255,255,255,0.06);
-      --glass-border: rgba(255,255,255,0.12);
-      --muted: #bfb8c9;
-      --accent-1: #7b2ae8; /* neon purple */
-      --accent-2: #9d47ff;
-      --danger: #ff3b3b;
-      --glass-blur: 12px;
-      --radius:16px;
+      --bg:#07070c; --card: rgba(255,255,255,0.06); --glass: rgba(255,255,255,0.12);
+      --muted: #bfb8c9; --accent: #7b2ae8; --danger: #ff3b3b;
     }
-    html,body{height:100%;background:var(--bg);color:#fff;-webkit-font-smoothing:antialiased}
-    a{color:inherit;text-decoration:none}
+    body{background:var(--bg);color:#fff;min-height:100vh}
+    
+    /* Navbar */
+    .navbar{display:flex;justify-content:space-between;padding:20px 5%;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--glass)}
+    .logo{font-weight:700;font-size:20px;color:var(--accent)}
+    .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:14px}
+    .btn-danger{background:var(--danger)}
+    .btn-outline{background:transparent;border:1px solid var(--glass)}
 
-    /* ----------------- NAVBAR (PixOra style, admin-minimal) ----------------- */
-    .navbar{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:24px 6%;
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-bottom:1px solid rgba(255,255,255,0.03);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 40px rgba(120,0,255,0.08);
-      position:sticky;
-      top:0;
-      z-index:50;
-    }
-    .brand { display:flex; gap:14px; align-items:center }
-    .logo{
-      width:56px;height:56px;border-radius:12px;
-      background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
-      display:grid;place-items:center;font-weight:700;color:white;font-size:20px;
-      box-shadow:0 6px 24px rgba(123,42,232,0.18);
-    }
-    .brand h1{font-size:18px;font-weight:600;letter-spacing:0.2px}
-    .brand p{color:var(--muted);font-size:13px;margin-top:2px}
+    /* Layout */
+    .wrap{display:grid;grid-template-columns:250px 1fr;gap:30px;padding:30px 5%}
+    
+    /* Sidebar */
+    .sidebar .nav-item{padding:12px;margin-bottom:8px;border-radius:10px;cursor:pointer;transition:0.2s}
+    .sidebar .nav-item:hover{background:rgba(255,255,255,0.05)}
+    .sidebar .nav-item.active{background:rgba(123,42,232,0.2);color:var(--accent)}
+    
+    /* Content */
+    .card{background:var(--card);border:1px solid var(--glass);border-radius:16px;padding:24px;margin-bottom:20px}
+    table{width:100%;border-collapse:collapse;margin-top:15px}
+    th{text-align:left;color:var(--muted);padding:10px;border-bottom:1px solid var(--glass)}
+    td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    
+    .badge{padding:4px 10px;border-radius:20px;font-size:12px;background:rgba(255,255,255,0.1)}
+    .badge-danger{background:rgba(255,59,59,0.2);color:#ff6b6b}
+    
+    .action-btn{padding:5px 10px;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;margin-right:4px;font-size:12px}
+    .action-btn:hover{background:var(--accent)}
 
-    .admin-actions{display:flex;gap:10px;align-items:center}
-    .nav-btn{
-      padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
-      background:transparent;color:#fff;font-size:14px;cursor:pointer;transition:all .18s;
-    }
-    .nav-btn:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(120,0,255,0.12);background:rgba(123,42,232,0.08)}
-    .nav-logout{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));border:none;padding:10px 14px;border-radius:10px}
-
-    /* ----------------- Layout: sidebar + content ----------------- */
-    .wrap{display:grid;grid-template-columns:280px 1fr;gap:28px;padding:28px 6%;align-items:start;min-height:calc(100vh - 120px)}
-    @media (max-width:980px){ .wrap{grid-template-columns:1fr; padding:18px 4%} .sidebar{position:static} }
-
-    /* ----------------- Sidebar ----------------- */
-    .sidebar{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:18px;
-      border:1px solid var(--glass-border);
-      backdrop-filter: blur(var(--glass-blur));
-      box-shadow:0 12px 40px rgba(123,42,232,0.06);
-      height:calc(100vh - 170px);
-      position:sticky; top:80px; overflow:auto;
-    }
-    .sidebar .nav-item{
-      display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;cursor:pointer;
-      transition:all .18s;
-    }
-    .sidebar .nav-item:hover{background:rgba(123,42,232,0.06); transform:translateX(6px)}
-    .sidebar .nav-item.active{background:linear-gradient(90deg, rgba(123,42,232,0.18), rgba(157,71,255,0.08));box-shadow:inset 0 0 0 1px rgba(157,71,255,0.04)}
-
-    .nav-icon{width:40px;height:40px;border-radius:10px;background:rgba(0,0,0,0.25);display:grid;place-items:center;color:var(--accent-1)}
-
-    .tip{font-size:13px;color:var(--muted);margin-top:12px}
-
-    /* ----------------- Content cards ----------------- */
-    .content{display:flex;flex-direction:column;gap:18px}
-    .card{
-      background:var(--card); padding:18px; border-radius:14px;
-      border:1px solid var(--glass-border); backdrop-filter: blur(var(--glass-blur));
-      box-shadow:0 20px 60px rgba(17,24,39,0.25);
-      animation: cardIn .6s cubic-bezier(.2,.9,.3,1);
-    }
-    @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-    .search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-    .search input{background:transparent;border:0;color:#fff;outline:none;padding:6px;width:300px}
-
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    thead th{color:var(--muted);text-align:left;padding:12px 8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
-    tbody td{padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle}
-
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);font-size:13px}
-    .badge-danger{background:rgba(255,60,60,0.12);color:var(--danger)}
-
-    .action-btn{padding:6px 8px;border-radius:10px;border:0;background:transparent;color:#fff;cursor:pointer}
-    .action-btn.primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;padding:6px 10px;border-radius:10px}
-    .action-btn.warn{background:rgba(255,200,50,0.08);color:#ffc542;border-radius:10px;padding:6px 10px}
-    .action-btn.block{background:rgba(255,60,60,0.06);color:var(--danger);border-radius:10px;padding:6px 10px}
-
-    .muted{color:var(--muted);font-size:13px}
-
-    /* ----------------- Modal ----------------- */
-    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:60}
-    .modal{width:820px;max-width:94%;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.06)}
-    .modal input, .modal textarea, .modal select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#fff;outline:none}
-
-    /* ----------------- Charts ----------------- */
-    .chart{width:100%;height:360px;border-radius:12px;overflow:hidden;background:transparent}
-
-    /* ----------------- Footer ----------------- */
-    .footer{
-      margin-top:28px;
-      padding:18px 6%;
-      border-top:1px solid rgba(255,255,255,0.03);
-      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      color:var(--muted); display:flex;justify-content:space-between;align-items:center;gap:12px;
-    }
-    .footer a{color:var(--muted);text-decoration:none}
-    .footer .small{font-size:13px}
-
-    /* small screens */
-    @media(max-width:720px){
-      .search input{width:140px}
-      .brand h1{display:none}
-      .wrap{grid-template-columns:1fr}
-      .sidebar{position:relative;height:auto}
-      .footer{flex-direction:column;align-items:flex-start;gap:8px;padding-bottom:36px}
-    }
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;place-items:center;z-index:100}
+    .modal{background:#1a1a20;padding:30px;border-radius:16px;width:500px;border:1px solid var(--glass)}
+    .modal input{width:100%;padding:10px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;margin-top:5px;margin-bottom:15px}
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="brand">
-      <div class="logo">AP</div>
-      <div>
-        <h1>PixOra — Admin</h1>
-        <p class="muted">Root admin — manage users, vendors, bookings & reports</p>
-      </div>
-    </div>
+  <nav class="navbar">
+    <div class="logo">PixOra Admin</div>
+    <button class="btn btn-outline" onclick="window.location.href='/'">Logout</button>
+  </nav>
 
-    <div class="admin-actions">
-      <!-- minimal options only (settings & preview removed) -->
-      <button class="nav-btn nav-logout" id="btnLogout"><a href="{{url_for('home')}}"></a>Logout</button>
-    </div>
-  </header>
-
-  <!-- MAIN LAYOUT -->
-  <main class="wrap">
-    <!-- SIDEBAR -->
+  <div class="wrap">
     <aside class="sidebar">
-      <div class="nav-item active" data-view="manage">
-        <div class="nav-icon">M</div>
-        <div>
-          <div style="font-weight:600">Manage</div>
-          <div class="muted" style="font-size:12px">Users & Vendors</div>
-        </div>
-      </div>
-
-      <!-- Pending and Bookings items removed as requested -->
-
-      <div class="nav-item" data-view="faq">
-        <div class="nav-icon">Q</div>
-        <div><div style="font-weight:600">FAQ</div><div class="muted" style="font-size:12px">Flagged queries</div></div>
-      </div>
-
-      <div class="nav-item" data-view="reports">
-        <div class="nav-icon">R</div>
-        <div><div style="font-weight:600">Reports</div><div class="muted" style="font-size:12px">ECharts visualizations</div></div>
-      </div>
-
-      <div class="nav-item" data-view="fraud">
-        <div class="nav-icon">⚠</div>
-        <div><div style="font-weight:600">Fraud Handler</div><div class="muted" style="font-size:12px">Seize & refund</div></div>
-      </div>
-
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
-      <div class="tip">Tip: This admin panel is demo-only. Replace stateful arrays with real API calls.</div>
+      <div class="nav-item active" onclick="switchView('manage')">Manage Database</div>
+      <div class="nav-item" onclick="switchView('reports')">Reports & Analytics</div>
+      <div class="nav-item" onclick="switchView('fraud')">Fraud Handler</div>
     </aside>
 
-    <!-- CONTENT -->
-    <section class="content">
-
-      <!-- MANAGE -->
-      <section id="view-manage" class="card">
-        <div class="toolbar">
-          <div>
-            <h3>Manage Users & Vendors</h3>
-            <div class="muted">Edit credentials, block or remove. Creation is disabled for admin.</div>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="search">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="#bfb8c9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" stroke="#bfb8c9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <input id="globalSearch" placeholder="Search users, vendors or emails..." />
-            </div>
-            <!-- Add buttons removed as requested -->
-          </div>
+    <main id="contentArea">
+      <div id="view-manage">
+        <div class="card">
+          <h3>Users</h3>
+          <table id="usersTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
-
-        <div class="card" style="padding:12px">
-          <h4 style="margin:4px 0 10px 0">Users</h4>
-          <div style="overflow:auto">
-            <table id="usersTable" aria-label="Users table">
-              <thead>
-                <tr><th>User</th><th>Email</th><th>Status</th><th>Actions</th></tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        <div class="card">
+          <h3>Vendors</h3>
+          <table id="vendorsTable">
+            <thead><tr><th>Name</th><th>Revenue</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
+      </div>
 
-        <div class="card" style="padding:12px">
-          <h4 style="margin:4px 0 10px 0">Vendors</h4>
-          <div style="overflow:auto">
-            <table id="vendorsTable" aria-label="Vendors table">
-              <thead>
-                <tr><th>Vendor</th><th>Rating</th><th>Revenue</th><th>Status</th><th>Actions</th></tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+      <div id="view-reports" style="display:none">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Analytics</h3>
+          <button class="btn" onclick="window.location.href='/api/export/vendors.csv'">Download CSV</button>
         </div>
-      </section>
+        <div class="card" id="chartRevenue" style="height:400px;"></div>
+      </div>
 
-      <!-- PENDING and BOOKINGS sections removed as requested -->
-
-      <!-- FAQ -->
-      <section id="view-faq" class="card" style="display:none">
-        <div class="toolbar">
-          <div>
-            <h3>FAQ Queries</h3>
-            <div class="muted">See incoming queries and flag inappropriate messages</div>
-          </div>
+      <div id="view-fraud" style="display:none">
+        <div class="card">
+          <h3>Automated Fraud Prevention</h3>
+          <p style="color:var(--muted);margin-bottom:20px">
+            Identify the highest revenue vendor, seize their funds, block their account, and refund users.
+          </p>
+          <button class="btn btn-danger" onclick="handleFraud()">Trigger Fraud Protocol</button>
+          <div id="fraudLog" style="margin-top:20px;font-family:monospace;color:#bbb"></div>
         </div>
+      </div>
+    </main>
+  </div>
 
-        <div id="faqList"></div>
-      </section>
-
-      <!-- REPORTS -->
-      <section id="view-reports" class="card" style="display:none">
-        <div class="toolbar">
-          <div><h3>Reports</h3><div class="muted">Vendor performance & revenue visualizations</div></div>
-          <div><button class="btn" id="genReportBtn">Generate</button> <button class="nav-btn" id="downloadSampleCSV">Export Sample CSV</button></div>
-        </div>
-
-        <div id="chartRevenue" class="chart card"></div>
-        <div id="chartRating" class="chart card" style="margin-top:12px"></div>
-      </section>
-
-      <!-- FRAUD -->
-      <section id="view-fraud" class="card" style="display:none">
-        <div class="toolbar">
-          <div>
-            <h3>Fraud Handler</h3>
-            <div class="muted">Seize vendor revenue, refund users, and block malicious vendors.</div>
-          </div>
-          <div><button class="btn btn-danger" id="startFraudFlow">Handle Fraud (Simulated)</button></div>
-        </div>
-
-        <div id="fraudLog" class="muted">No fraud actions yet.</div>
-      </section>
-
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="footer" role="contentinfo">
-    <div class="small">© <span id="yr"></span> PixOra — Admin Panel. All rights reserved.</div>
-    <div>
-      <a href="#" onclick="alert('Help center (simulated)')">Help</a> ·
-      <a href="#" onclick="alert('Contact support (simulated)')">Contact</a> ·
-      <a href="#" onclick="alert('Privacy policy (simulated)')">Privacy</a>
-    </div>
-  </footer>
-
-  <!-- MODAL BACKDROP -->
-  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
-    <div class="modal" id="modalInner" role="document"></div>
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal" id="modalContent"></div>
   </div>
 
   <script>
-  /*****************************************************************************
-   * Demo data (replace with real API calls)
-   *****************************************************************************/
-  const state = {
-    users: [
-      { id: 'u1', name: 'Alice Johnson', email: 'alice@example.com', blocked: false, balance: 10 },
-      { id: 'u2', name: 'Bob Martin', email: 'bob@example.com', blocked: false, balance: 2.5 },
-      { id: 'u3', name: 'Celine Grace', email: 'celine@example.com', blocked: true, balance: 0 }
-    ],
-    vendors: [
-      { id: 'v1', name: 'Studio One', rating: 4.9, revenue: 3420.50, blocked: false, reviews: 120 },
-      { id: 'v2', name: 'LensCraft', rating: 3.6, revenue: 500.00, blocked: false, reviews: 18 },
-      { id: 'v3', name: 'FlashFrame', rating: 2.9, revenue: 120.25, blocked: true, reviews: 7 }
-    ],
-    bookings: [
-      { id: 'b1', user: 'Alice Johnson', vendor: 'Studio One', date: '2025-11-05', status: 'confirmed' },
-      { id: 'b2', user: 'Bob Martin', vendor: 'LensCraft', date: '2025-11-12', status: 'pending' }
-    ],
-    faqQueries: [
-      { id: 'q1', author: 'alice@example.com', text: 'How long until photos delivered?', flagged: false },
-      { id: 'q2', author: 'spammer@example.com', text: 'Buy followers now', flagged: false }
-    ],
-    pendingUsers: [
-      { id: 'pu1', name: 'New User', email: 'newuser@mail.com' }
-    ],
-    pendingVendors: [
-      { id: 'pv1', name: 'New Studio', category: 'Photography' }
-    ],
-    fraudLogs: []
-  };
+    // Global State
+    let state = { users: [], vendors: [] };
 
-  /* ---------- UI helpers ---------- */
-  function $(sel){ return document.querySelector(sel) }
-  function $all(sel){ return Array.from(document.querySelectorAll(sel)) }
-
-  /* ---------- Render functions ---------- */
-  function renderUsers(){
-    const tbody = $('#usersTable tbody'); if(!tbody) return;
-    tbody.innerHTML = '';
-    const q = $('#globalSearch').value.trim().toLowerCase();
-    const list = state.users.filter(u => !q || (u.name + u.email).toLowerCase().includes(q));
-    list.forEach(u => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${u.name}</strong><div class="muted">${u.id}</div></td>
-        <td>${u.email}</td>
-        <td>${u.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
-        <td>
-          <button class="action-btn" onclick="openEditUser('${u.id}')">Edit</button>
-          <button class="action-btn block" onclick="toggleBlockUser('${u.id}')">${u.blocked ? 'Unblock' : 'Block'}</button>
-          <button class="action-btn" onclick="removeUser('${u.id}')">Remove</button>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderVendors(){
-    const tbody = $('#vendorsTable tbody'); if(!tbody) return;
-    tbody.innerHTML = '';
-    const q = $('#globalSearch').value.trim().toLowerCase();
-    const list = state.vendors.filter(v => !q || (v.name).toLowerCase().includes(q));
-    list.forEach(v => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${v.name}</strong><div class="muted">${v.id}</div></td>
-        <td>${v.rating.toFixed(1)} / 5 <span class="muted">(${v.reviews} reviews)</span></td>
-        <td>$${Number(v.revenue).toFixed(2)}</td>
-        <td>${v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
-        <td>
-          <button class="action-btn primary" onclick="openEditVendor('${v.id}')">Edit</button>
-          <button class="action-btn block" onclick="toggleBlockVendor('${v.id}')">${v.blocked ? 'Unblock' : 'Block'}</button>
-          <button class="action-btn" onclick="removeVendor('${v.id}')">Remove</button>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderBookings(){
-    const table = document.getElementById('bookingsTable');
-    if(!table) return; // bookings removed — guard
-    const tbody = table.querySelector('tbody'); if(!tbody) return;
-    tbody.innerHTML = '';
-    state.bookings.forEach(b => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${b.id}</td>
-        <td>${b.user}</td>
-        <td>${b.vendor}</td>
-        <td>${b.date}</td>
-        <td><span class="badge">${b.status}</span></td>
-        <td>
-          <button class="action-btn" onclick="changeBookingStatus('${b.id}','confirmed')">Confirm</button>
-          <button class="action-btn warn" onclick="changeBookingStatus('${b.id}','cancelled')">Cancel</button>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderFAQ(){
-    const container = $('#faqList'); if(!container) return;
-    container.innerHTML = '';
-    state.faqQueries.forEach(q => {
-      const div = document.createElement('div'); div.className='card'; div.style.marginBottom='8px';
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div><strong>${q.author}</strong><div class="muted" style="margin-top:6px">${q.text}</div></div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <button class="nav-btn" onclick="flagFAQ('${q.id}')">${q.flagged ? 'Flagged' : 'Flag'}</button>
-            <button class="nav-btn" onclick="blockAuthorFromFAQ('${q.author}','${q.id}')">Block Author</button>
-          </div>
-        </div>`;
-      container.appendChild(div);
-    });
-  }
-
-  function renderPending(){
-    // pending section removed — guard to prevent errors if invoked elsewhere
-    const pendingUsersTable = document.getElementById('pendingUsers');
-    const pendingVendorsTable = document.getElementById('pendingVendors');
-    if(!pendingUsersTable && !pendingVendorsTable) return;
-    if(pendingUsersTable) pendingUsersTable.querySelector('tbody').innerHTML = state.pendingUsers.map(u => `
-      <tr><td>${u.name}</td><td>${u.email}</td>
-      <td>
-        <button class="action-btn primary" onclick="approvePendingUser('${u.id}')">Approve</button>
-        <button class="action-btn" onclick="rejectPendingUser('${u.id}')">Reject</button>
-      </td></tr>`).join('');
-    if(pendingVendorsTable) pendingVendorsTable.querySelector('tbody').innerHTML = state.pendingVendors.map(v => `
-      <tr><td>${v.name}</td><td>${v.category}</td>
-      <td>
-        <button class="action-btn primary" onclick="approvePendingVendor('${v.id}')">Approve</button>
-        <button class="action-btn" onclick="rejectPendingVendor('${v.id}')">Reject</button>
-      </td></tr>`).join('');
-  }
-
-  /* ---------- CRUD and actions (simulate server) ---------- */
-  function openEditUser(id){
-    const u = state.users.find(x=>x.id===id); if(!u) return alert('User not found');
-    openModal(`<h3>Edit User — ${u.name}</h3>
-      <div style="margin-top:10px"><label>Email</label><input id="m_email" value="${u.email}"></div>
-      <div style="margin-top:8px"><label>Balance</label><input id="m_balance" type="number" step="0.01" value="${u.balance}"></div>
-      <div style="margin-top:12px;display:flex;justify-content:space-between">
-        <div><button class="nav-btn" onclick="removeUser('${u.id}')">Delete User</button></div>
-        <div style="display:flex;gap:8px">
-          <button class="nav-btn" onclick="closeModal()">Cancel</button>
-          <button class="btn" onclick="saveUserEdit('${u.id}')">Save</button>
-        </div>
-      </div>`);
-  }
-
-  function saveUserEdit(id){
-    const user = state.users.find(u=>u.id===id);
-    if(!user) return;
-    user.email = $('#m_email').value.trim();
-    user.balance = parseFloat($('#m_balance').value) || 0;
-    closeModal(); renderUsers();
-    // TODO: PATCH /api/admin/users/:id
-  }
-
-  function removeUser(id){
-    if(!confirm('Remove this user?')) return;
-    state.users = state.users.filter(u=>u.id!==id);
-    closeModal(); renderUsers();
-    // TODO: DELETE /api/admin/users/:id
-  }
-
-  function toggleBlockUser(id){
-    const u = state.users.find(x=>x.id===id); if(!u) return;
-    u.blocked = !u.blocked; renderUsers();
-    // TODO: PATCH
-  }
-
-  // Vendors
-  function openEditVendor(id){
-    const v = state.vendors.find(x=>x.id===id); if(!v) return alert('Vendor not found');
-    openModal(`<h3>Edit Vendor — ${v.name}</h3>
-      <div style="margin-top:10px"><label>Name</label><input id="m_name" value="${v.name}"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <div style="flex:1"><label>Rating</label><input id="m_rating" type="number" step="0.1" value="${v.rating}"></div>
-        <div style="width:200px"><label>Revenue</label><input id="m_revenue" type="number" step="0.01" value="${v.revenue}"></div>
-      </div>
-      <div style="margin-top:12px;display:flex;justify-content:space-between">
-        <div><button class="nav-btn" onclick="removeVendor('${v.id}')">Delete Vendor</button></div>
-        <div style="display:flex;gap:8px">
-          <button class="nav-btn" onclick="closeModal()">Cancel</button>
-          <button class="btn" onclick="saveVendorEdit('${v.id}')">Save</button>
-        </div>
-      </div>`);
-  }
-
-  function saveVendorEdit(id){
-    const v = state.vendors.find(x=>x.id===id);
-    v.name = $('#m_name').value.trim();
-    v.rating = parseFloat($('#m_rating').value) || 0;
-    v.revenue = parseFloat($('#m_revenue').value) || 0;
-    closeModal(); renderVendors();
-    // TODO: PATCH /api/admin/vendors/:id
-  }
-
-  function removeVendor(id){
-    if(!confirm('Remove this vendor? This action is permanent.')) return;
-    state.vendors = state.vendors.filter(v=>v.id!==id);
-    closeModal(); renderVendors();
-    // TODO: DELETE /api/admin/vendors/:id
-  }
-
-  function toggleBlockVendor(id){
-    const v = state.vendors.find(x=>x.id===id); if(!v) return;
-    v.blocked = !v.blocked; renderVendors();
-    // TODO: PATCH
-  }
-
-  // Bookings
-  function changeBookingStatus(id,status){
-    const b = state.bookings.find(x=>x.id===id); if(!b) return;
-    b.status = status; renderBookings();
-    // TODO: PATCH
-  }
-
-  // FAQ
-  function flagFAQ(id){
-    const q = state.faqQueries.find(x=>x.id===id); if(!q) return;
-    q.flagged = !q.flagged; renderFAQ();
-    // TODO: PATCH
-  }
-
-  function blockAuthorFromFAQ(author,qid){
-    const email = author.includes(':')?author.split(':')[1]:author;
-    const u = state.users.find(x=>x.email===email);
-    if(u){ u.blocked = true; renderUsers(); } else {
-      const id = 'u'+Math.random().toString(36).slice(2,8);
-      state.users.push({ id, name: email, email, blocked:true, balance:0 });
+    // --- API Interactions ---
+    async function fetchData() {
+      try {
+        const [uRes, vRes] = await Promise.all([
+          fetch('/api/users'),
+          fetch('/api/vendors')
+        ]);
+        state.users = await uRes.json();
+        state.vendors = await vRes.json();
+        renderAll();
+      } catch (err) {
+        console.error("Failed to fetch data", err);
+      }
     }
-    const q = state.faqQueries.find(x=>x.id===qid); if(q) q.flagged = true;
-    renderFAQ(); alert('Author blocked and message flagged.');
-    // TODO: block user server-side
-  }
 
-  // Pending (approve/reject) - kept but guarded
-  function approvePendingUser(id){
-    const idx = state.pendingUsers.findIndex(x=>x.id===id); if(idx===-1) return;
-    const u = state.pendingUsers.splice(idx,1)[0];
-    const newId = 'u'+Math.random().toString(36).slice(2,8);
-    state.users.push({ id:newId, name:u.name, email:u.email, blocked:false, balance:0 });
-    renderPending(); renderUsers();
-    alert('User approved (simulated).');
-    // TODO: backend: accept user signup
-  }
+    async function apiCall(url, method, body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(url, opts);
+      return res.json();
+    }
 
-  function rejectPendingUser(id){
-    if(!confirm('Reject this user request?')) return;
-    state.pendingUsers = state.pendingUsers.filter(x=>x.id!==id);
-    renderPending();
-    // TODO: backend: reject
-  }
+    // --- Render Logic ---
+    function renderAll() {
+      const uBody = document.querySelector('#usersTable tbody');
+      uBody.innerHTML = state.users.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>$${u.balance.toFixed(2)}</td>
+          <td>${u.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
+          <td>
+            <button class="action-btn" onclick="openEditUser('${u.id}')">Edit</button>
+            <button class="action-btn" onclick="toggleBlockUser('${u.id}', ${!u.blocked})">${u.blocked?'Unblock':'Block'}</button>
+            <button class="action-btn" style="color:#ff6b6b" onclick="deleteItem('users','${u.id}')">Del</button>
+          </td>
+        </tr>
+      `).join('');
 
-  function approvePendingVendor(id){
-    const idx = state.pendingVendors.findIndex(x=>x.id===id); if(idx===-1) return;
-    const v = state.pendingVendors.splice(idx,1)[0];
-    const newId = 'v'+Math.random().toString(36).slice(2,8);
-    state.vendors.push({ id:newId, name:v.name, rating:4.5, revenue:0, blocked:false, reviews:0 });
-    renderPending(); renderVendors();
-    alert('Vendor approved (simulated).');
-    // TODO: backend: accept vendor signup
-  }
+      const vBody = document.querySelector('#vendorsTable tbody');
+      vBody.innerHTML = state.vendors.map(v => `
+        <tr>
+          <td>${v.name}</td>
+          <td>$${v.revenue.toFixed(2)}</td>
+          <td>⭐ ${v.rating}</td>
+          <td>${v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
+          <td>
+            <button class="action-btn" onclick="openEditVendor('${v.id}')">Edit</button>
+            <button class="action-btn" onclick="toggleBlockVendor('${v.id}', ${!v.blocked})">${v.blocked?'Unblock':'Block'}</button>
+            <button class="action-btn" style="color:#ff6b6b" onclick="deleteItem('vendors','${v.id}')">Del</button>
+          </td>
+        </tr>
+      `).join('');
 
-  function rejectPendingVendor(id){
-    if(!confirm('Reject this vendor request?')) return;
-    state.pendingVendors = state.pendingVendors.filter(x=>x.id!==id);
-    renderPending();
-    // TODO: backend: reject
-  }
+      renderChart();
+    }
 
-  // Reports -> ECharts
-  function renderReports(){
-    const revenueEl = document.getElementById('chartRevenue');
-    const ratingEl = document.getElementById('chartRating');
-    if(!revenueEl || !ratingEl) return;
-    // Revenue bar chart
-    const revenueChart = echarts.init(revenueEl);
-    revenueChart.setOption({
-      title:{text:'Vendor Revenue', left:'center', textStyle:{color:'#fff'}},
-      tooltip:{},
-      xAxis:{type:'category', data: state.vendors.map(v=>v.name), axisLabel:{color:'#ddd'}},
-      yAxis:{type:'value', axisLabel:{color:'#ddd'}},
-      series:[{type:'bar', data: state.vendors.map(v=>v.revenue), itemStyle:{color:{type:'linear', x:0, y:0, x2:1, y2:0, colorStops:[{offset:0, color: 'rgba(123,42,232,0.9)'},{offset:1,color:'rgba(157,71,255,0.9)'}]}}}]
-    });
+    // --- Actions ---
+    async function toggleBlockUser(id, status) {
+      await apiCall(`/api/users/${id}`, 'PATCH', { blocked: status });
+      fetchData();
+    }
+    
+    async function toggleBlockVendor(id, status) {
+      await apiCall(`/api/vendors/${id}`, 'PATCH', { blocked: status });
+      fetchData();
+    }
 
-    // Rating line chart
-    const ratingChart = echarts.init(ratingEl);
-    ratingChart.setOption({
-      title:{text:'Vendor Rating', left:'center', textStyle:{color:'#fff'}},
-      tooltip:{},
-      xAxis:{type:'category', data: state.vendors.map(v=>v.name), axisLabel:{color:'#ddd'}},
-      yAxis:{type:'value', min:0, max:5, axisLabel:{color:'#ddd'}},
-      series:[{type:'line', data: state.vendors.map(v=>v.rating), smooth:true, lineStyle:{width:3, color:'rgba(157,71,255,0.9)'}, areaStyle:{color:'rgba(123,42,232,0.12)'}}]
-    });
-  }
+    async function deleteItem(type, id) {
+      if(!confirm("Are you sure? This cannot be undone.")) return;
+      await apiCall(`/api/${type}/${id}`, 'DELETE');
+      fetchData();
+    }
 
-  // Export CSV
-  function exportReportCSV(){
-    const rows = [['vendor_id','name','rating','reviews','revenue','blocked']];
-    state.vendors.forEach(v => rows.push([v.id, v.name, v.rating, v.reviews, v.revenue, v.blocked]));
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type:'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'vendor-report.csv'; a.click(); URL.revokeObjectURL(url);
-  }
+    async function handleFraud() {
+      if(!confirm("WARNING: This will block the highest earning vendor and seize their revenue. Proceed?")) return;
+      
+      const res = await apiCall('/api/fraud/handle', 'POST');
+      const log = document.getElementById('fraudLog');
+      
+      if(res.success) {
+        log.innerHTML += `<div style="color:#4ade80;margin-top:5px">
+          [SUCCESS] Seized $${res.extracted} from ${res.vendor}. Refunded ${res.refunded_count} users.
+        </div>`;
+        fetchData();
+      } else {
+        log.innerHTML += `<div style="color:#f87171;margin-top:5px">[ERROR] ${res.error}</div>`;
+      }
+    }
 
-  // Fraud handler (simulated)
-  function handleFraud(){
-    const v = state.vendors.filter(v=>!v.blocked).sort((a,b)=>b.revenue-a.revenue)[0];
-    if(!v) return alert('No candidate vendor to handle (all blocked).');
-    if(!confirm(`Handle fraud for ${v.name}? This will extract revenue $${v.revenue.toFixed(2)} and block the vendor.`)) return;
-    const extracted = v.revenue; v.revenue = 0; v.blocked = true;
-    const recipients = state.users.slice(0,3);
-    const perUser = (extracted * 0.8)/(recipients.length||1);
-    recipients.forEach(u => u.balance = (u.balance||0)+perUser);
-    const log = { ts: new Date().toISOString(), vendor: v.id, extracted, refundedToUsers: recipients.map(r=>({id:r.id,amount:perUser}))};
-    state.fraudLogs.push(log);
-    $('#fraudLog').innerHTML = `<div>Handled vendor <strong>${v.name}</strong>. Extracted $${extracted.toFixed(2)}; refunded $${(perUser*recipients.length).toFixed(2)} to ${recipients.length} users.</div>`;
-    renderUsers(); renderVendors();
-    alert('Fraud handled (simulated). Check Fraud Log.');
-    // TODO: call backend /admin/fraud to perform actual operations
-  }
+    // --- Modals ---
+    function openEditUser(id) {
+      const u = state.users.find(x => x.id === id);
+      const html = `
+        <h3 style="color:#fff;margin-bottom:15px">Edit User</h3>
+        <label>Email / Username</label>
+        <input id="edit_email" value="${u.email}">
+        <label>Balance</label>
+        <input id="edit_bal" type="number" value="${u.balance}">
+        <div style="text-align:right">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="saveUser('${id}')">Save</button>
+        </div>
+      `;
+      showModal(html);
+    }
 
-  /* ---------- Modal helpers ---------- */
-  function openModal(innerHtml){
-    const backdrop = document.getElementById('modalBackdrop'), inner = document.getElementById('modalInner');
-    inner.innerHTML = innerHtml; backdrop.style.display='flex'; backdrop.setAttribute('aria-hidden','false');
-  }
-  function closeModal(){ const backdrop = document.getElementById('modalBackdrop'); backdrop.style.display='none'; backdrop.setAttribute('aria-hidden','true'); }
-  document.getElementById('modalBackdrop').addEventListener('click', (e) => { if(e.target===document.getElementById('modalBackdrop')) closeModal(); });
+    async function saveUser(id) {
+      const email = document.getElementById('edit_email').value;
+      const bal = document.getElementById('edit_bal').value;
+      await apiCall(`/api/users/${id}`, 'PATCH', { email: email, balance: bal });
+      closeModal();
+      fetchData();
+    }
 
-  /* ---------- Navigation ---------- */
-  $all('.nav-item').forEach(n => {
-    n.addEventListener('click', () => {
-      $all('.nav-item').forEach(x => x.classList.remove('active'));
-      n.classList.add('active');
-      const view = n.dataset.view;
-      $all('[id^="view-"]').forEach(v => v.style.display='none');
-      const el = document.getElementById(`view-${view}`);
-      if(el) el.style.display='';
-      // lazy render
-      if(view === 'manage'){ renderUsers(); renderVendors(); }
-      if(view === 'faq'){ renderFAQ(); }
-      if(view === 'reports'){ renderReports(); }
-      if(view === 'fraud'){ /* nothing to render initially */ }
-    });
-  });
+    function openEditVendor(id) {
+      const v = state.vendors.find(x => x.id === id);
+      const html = `
+        <h3 style="color:#fff;margin-bottom:15px">Edit Vendor</h3>
+        <label>Name</label>
+        <input id="edit_vname" value="${v.name}">
+        <label>Revenue</label>
+        <input id="edit_rev" type="number" value="${v.revenue}">
+        <div style="text-align:right">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="saveVendor('${id}')">Save</button>
+        </div>
+      `;
+      showModal(html);
+    }
 
-  /* ---------- Top-level bindings ---------- */
-  document.getElementById('globalSearch').addEventListener('input', ()=>{ renderUsers(); renderVendors(); });
-  const genBtn = document.getElementById('genReportBtn'); if(genBtn) genBtn.addEventListener('click', ()=>{ renderReports(); });
-  const csvBtn = document.getElementById('downloadSampleCSV'); if(csvBtn) csvBtn.addEventListener('click', exportReportCSV);
-  const fraudBtn = document.getElementById('startFraudFlow'); if(fraudBtn) fraudBtn.addEventListener('click', handleFraud);
-  document.getElementById('btnLogout').addEventListener('click', ()=>{ alert('Logged out (simulated)'); /* TODO: call logout */ });
+    async function saveVendor(id) {
+      const name = document.getElementById('edit_vname').value;
+      const rev = document.getElementById('edit_rev').value;
+      await apiCall(`/api/vendors/${id}`, 'PATCH', { name: name, revenue: rev });
+      closeModal();
+      fetchData();
+    }
 
-  // Expose functions for inline HTML buttons:
-  window.openEditUser = openEditUser;
-  window.saveUserEdit = saveUserEdit;
-  window.removeUser = removeUser;
-  window.toggleBlockUser = toggleBlockUser;
-  window.openEditVendor = openEditVendor;
-  window.saveVendorEdit = saveVendorEdit;
-  window.removeVendor = removeVendor;
-  window.toggleBlockVendor = toggleBlockVendor;
-  window.flagFAQ = flagFAQ;
-  window.blockAuthorFromFAQ = blockAuthorFromFAQ;
-  window.approvePendingUser = approvePendingUser;
-  window.rejectPendingUser = rejectPendingUser;
-  window.approvePendingVendor = approvePendingVendor;
-  window.rejectPendingVendor = rejectPendingVendor;
-  window.changeBookingStatus = changeBookingStatus;
-  window.exportReportCSV = exportReportCSV;
-  window.handleFraud = handleFraud;
+    function showModal(html) {
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('editModal').style.display = 'grid';
+    }
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
 
-  // Initial render (only views that exist)
-  renderUsers(); renderVendors(); renderFAQ();
+    // --- View Switching ---
+    function switchView(viewName) {
+      document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
+      document.getElementById(`view-${viewName}`).style.display = 'block';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+      if(viewName === 'reports') renderChart();
+    }
 
-  // Footer year
-  document.getElementById('yr').textContent = new Date().getFullYear();
+    // --- Charts ---
+    let myChart = null;
+    function renderChart() {
+      const el = document.getElementById('chartRevenue');
+      if(el.offsetParent === null) return; // Hidden
+      
+      if(myChart) myChart.dispose();
+      myChart = echarts.init(el);
+      
+      myChart.setOption({
+        title: { text: 'Vendor Revenue', textStyle: { color: '#fff' } },
+        tooltip: {},
+        xAxis: { type: 'category', data: state.vendors.map(v => v.name), axisLabel: { color: '#888' } },
+        yAxis: { type: 'value', axisLabel: { color: '#888' } },
+        series: [{
+          type: 'bar',
+          data: state.vendors.map(v => v.revenue),
+          itemStyle: { color: '#7b2ae8' }
+        }]
+      });
+    }
+
+    // Init
+    fetchData();
   </script>
 </body>
 </html>

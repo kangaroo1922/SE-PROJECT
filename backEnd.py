@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,jsonify, send_file, abort, Response
 from flask import Flask, request, render_template, session, redirect, url_for, send_file
 from pymongo import MongoClient
 import gridfs
@@ -7,6 +7,7 @@ from flask import Flask, request, render_template, send_file
 import io
 from bson.errors import InvalidId
 import bcrypt
+import csv, io, os, datetime
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
@@ -16,6 +17,7 @@ users = db["user_credentials"]
 vendorBio = db["vendor_biodata"]
 userOrder = db["order_details"]
 admin_collection = db["admin_collection"]
+fraud_logs_col = db["fraudLogs"]
 fs = gridfs.GridFS(db)
 @app.route("/profile/<vendor_id>")
 def profile(vendor_id):
@@ -177,50 +179,75 @@ def booking_details():
         current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
 
     return render_template('bookingpanel.html', vendor=current_vendor, bill=bill)
+
 @app.route('/updateOrders', methods=['POST'])
 def updateOrders():
-    orders = list(request.form.lists())
-
-    # request.form contains flat data → state_<id>: value
-
     for key, value in request.form.items():
         if key.startswith("state_"):
             order_id = key.replace("state_", "")
-            state = value  # 'accept' or 'reject'
+            state = value  # accept OR reject
 
+            # Update order state
             db['order_details'].update_one(
                 {"_id": ObjectId(order_id)},
                 {"$set": {"state": state}}
             )
 
+            # If accepted → update vendor revenue
+            if state == "accept":
+
+                # Extract bill value from form
+                bill_key = f"bill_{order_id}"
+                bill_str = request.form.get(bill_key, "0")
+                try:
+                    bill_amount = float(bill_str)
+                except ValueError:
+                    bill_amount = 0
+                print("Bill received:", bill_amount)
+
+                # Extract vendor_id from form
+                vendor_key = f"vendor_{order_id}"
+                vendor_id = request.form.get(vendor_key)
+                print(vendor_id)
+                print("Vendor ID received:", vendor_id)
+                vendor_doc = db['vendor_biodata'].find_one({"vendor_id": vendor_id})
+                currentRevenue = vendor_doc.get("revenue", 0)
+                totalRevenue = currentRevenue + bill_amount
+                if vendor_id and bill_amount > 0:
+                    # Increment revenue in vendorBio
+                    result = db['vendor_biodata'].update_one(
+                        {"vendor_id": vendor_id},
+                        {"$inc": {"revenue": totalRevenue}}
+                    )
+                    print("Revenue update matched:", result.matched_count, "modified:", result.modified_count)
+
     return redirect(url_for('vendorDashboard'))
+
+
 
 
 # ... existing code ...
 @app.route('/vendorDashboard')
 def vendorDashboard():
-    # 1. Security Check
-    if 'vendor_id' not in session:
-        return redirect(url_for('vendor_login'))
 
     # This is the vendor_credentials._id stored as a string
     current_vendor_id = session['vendor_id']
+    print(current_vendor_id)
     # 3. Fetch orders where chosenVendorId matches vendor_id
     my_orders = list(
-        db['order_details']
-        .find({"chosenVendorId": current_vendor_id,
-               "state": {"$exists": False}
-               })
-        
-        .sort("date", -1)
-    )
+    db['order_details'].find({
+        "chosenVendorId": current_vendor_id,
+        "$or": [
+            {"state": {"$exists": False}},
+            {"state": ""},
+            {"state": None}
+        ]
+    }).sort("date", -1)
+)
 
-    # 4. Render dashboard
-    return render_template(
-        'vendorDashboard.html',
-        orders=my_orders,
-        vendor=current_vendor_id
-    )
+    print(list(db['order_details'].find({"chosenVendorId": current_vendor_id}, {"state": 1, "_id": 1})))
+
+    return render_template('vendorDashboard.html' ,orders = my_orders, vendor_id = current_vendor_id)
 
 
 #route to the user order dashboard
@@ -331,7 +358,8 @@ def vendorPanelUpdateBio():
                     "package1": package1,
                     "package2": package2,
                     "package3": package3,
-                    "images": image_ids
+                    "images": image_ids,
+                    "revenue": 0
                 }
             },
             upsert=True
@@ -380,5 +408,199 @@ def adminLogin():
 def adminPanel():
     if request.method == 'GET':
         return render_template('adminPanel.html')
+# Utility to convert ObjectId to string in documents
+def oid_to_str(doc):
+    if not doc: return doc
+    if isinstance(doc, list):
+        return [oid_to_str(x) for x in doc]
+    if isinstance(doc, dict):
+        new_doc = {}
+        for k, v in doc.items():
+            if k == "_id":
+                new_doc["id"] = str(v)
+            elif isinstance(v, ObjectId):
+                new_doc[k] = str(v)
+            else:
+                new_doc[k] = oid_to_str(v)
+        return new_doc
+    return doc
+
+# ------------------ API: USERS ------------------
+@app.route("/api/users", methods=["GET"])
+def get_users_api():
+    try:
+        user_list = list(users.find({}))
+        cleaned = []
+        for u in user_list:
+            cleaned.append({
+                "id": str(u["_id"]),
+                "name": u.get("userName", "Unknown"), # Assuming username is the display name
+                "email": u.get("userName", ""),       # Using username as email/contact identifier
+                "balance": float(u.get("balance", 0.0)),
+                "blocked": u.get("blocked", False)
+            })
+        return jsonify(cleaned)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/users/<user_id>", methods=["PATCH", "DELETE"])
+def manage_user_api(user_id):
+    try:
+        oid = ObjectId(user_id)
+    except:
+        return jsonify({"error": "Invalid ID format"}), 400
+
+    if request.method == "DELETE":
+        users.delete_one({"_id": oid})
+        return jsonify({"success": True})
+
+    if request.method == "PATCH":
+        data = request.json
+        update_fields = {}
+        
+        # Map frontend fields to DB fields
+        if "email" in data: update_fields["userName"] = data["email"]
+        if "balance" in data: update_fields["balance"] = float(data["balance"])
+        if "blocked" in data: update_fields["blocked"] = bool(data["blocked"])
+        
+        if update_fields:
+            users.update_one({"_id": oid}, {"$set": update_fields})
+        return jsonify({"success": True})
+
+# ------------------ API: VENDORS ------------------
+@app.route("/api/vendors", methods=["GET"])
+def get_vendors_api():
+    try:
+        # Vendor data is split: Credentials (auth/block status) + Biodata (profile/revenue)
+        creds = list(vendors.find({}))
+        merged_list = []
+        
+        for v in creds:
+            vid = str(v["_id"])
+            bio = vendorBio.find_one({"vendor_id": vid}) or {}
+            
+            merged_list.append({
+                "id": vid,
+                "name": bio.get("full_name") or v.get("userName", "Unknown"),
+                "rating": float(bio.get("rating", 0.0)),
+                "revenue": float(bio.get("revenue", 0.0)),
+                "reviews": int(bio.get("reviews", 0)),
+                "blocked": v.get("blocked", False)
+            })
+        return jsonify(merged_list)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/vendors/<vendor_id>", methods=["PATCH", "DELETE"])
+def manage_vendor_api(vendor_id):
+    try:
+        oid = ObjectId(vendor_id)
+    except:
+        return jsonify({"error": "Invalid ID format"}), 400
+
+    if request.method == "DELETE":
+        vendors.delete_one({"_id": oid})
+        vendorBio.delete_one({"vendor_id": vendor_id})
+        return jsonify({"success": True})
+
+    if request.method == "PATCH":
+        data = request.json
+        
+        # 1. Update Credentials Collection (Blocked Status / Username)
+        cred_updates = {}
+        if "blocked" in data: cred_updates["blocked"] = data["blocked"]
+        if cred_updates:
+            vendors.update_one({"_id": oid}, {"$set": cred_updates})
+        
+        # 2. Update Biodata Collection (Name, Revenue, Rating)
+        bio_updates = {}
+        if "name" in data: bio_updates["full_name"] = data["name"]
+        if "rating" in data: bio_updates["rating"] = float(data["rating"])
+        if "revenue" in data: bio_updates["revenue"] = float(data["revenue"])
+        
+        if bio_updates:
+            vendorBio.update_one({"vendor_id": vendor_id}, {"$set": bio_updates})
+            
+        return jsonify({"success": True})
+
+# ------------------ API: FRAUD HANDLER ------------------
+@app.route("/api/fraud/handle", methods=["POST"])
+def fraud_handler():
+    try:
+        # Logic: Find unblocked vendor with highest revenue
+        all_bios = list(vendorBio.find().sort("revenue", -1))
+        target_vendor = None
+        
+        for bio in all_bios:
+            if bio.get("revenue", 0) > 1000000:
+                # Check credential status
+                cred = vendors.find_one({"_id": ObjectId(bio["vendor_id"])})
+                if cred and not cred.get("blocked", False):
+                    target_vendor = bio
+                    break
+        
+        if not target_vendor:
+            return jsonify({"success": False, "error": "No high-revenue active vendors found."}), 404
+
+        vid = target_vendor["vendor_id"]
+        extracted_amount = float(target_vendor.get("revenue", 0))
+
+        # 1. Block Vendor
+        vendors.update_one({"_id": ObjectId(vid)}, {"$set": {"blocked": True}})
+        
+        # 2. Seize Revenue
+        vendorBio.update_one({"vendor_id": vid}, {"$set": {"revenue": 0}})
+
+        # 3. Refund Users (Top 3 users, simulated distribution)
+        recipients = list(users.find().limit(3))
+        refund_logs = []
+        if recipients:
+            amount_per_user = (extracted_amount * 0.8) / len(recipients)
+            for u in recipients:
+                users.update_one({"_id": u["_id"]}, {"$inc": {"balance": amount_per_user}})
+                refund_logs.append({"id": str(u["_id"]), "amount": amount_per_user})
+        
+        # 4. Log Action
+        log_entry = {
+            "ts": datetime.datetime.now(),
+            "vendor_name": target_vendor.get("full_name", "Unknown"),
+            "vendor_id": vid,
+            "extracted": extracted_amount,
+            "refunded": refund_logs
+        }
+        fraud_logs_col.insert_one(log_entry)
+
+        return jsonify({
+            "success": True, 
+            "vendor": target_vendor.get("full_name"), 
+            "extracted": extracted_amount,
+            "refunded_count": len(refund_logs)
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ------------------ API: EXPORT CSV ------------------
+@app.route("/api/export/vendors.csv")
+def export_csv_api():
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Vendor ID", "Name", "Revenue", "Rating", "Blocked Status"])
+    
+    creds = vendors.find()
+    for v in creds:
+        vid = str(v["_id"])
+        bio = vendorBio.find_one({"vendor_id": vid}) or {}
+        writer.writerow([
+            vid,
+            bio.get("full_name", v.get("userName")),
+            bio.get("revenue", 0),
+            bio.get("rating", 0),
+            "Blocked" if v.get("blocked") else "Active"
+        ])
+        
+    output.seek(0)
+    return Response(output.getvalue(), mimetype="text/csv", 
+                    headers={"Content-Disposition": "attachment;filename=pixora_vendors_report.csv"})
+
 if __name__ == '__main__':
     app.run(debug=True)
