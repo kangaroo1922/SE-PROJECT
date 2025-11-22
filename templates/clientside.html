@@ -462,18 +462,19 @@
                     </div>
 
                     <div class="nav-right">
-                              <button id="SignupBtn">Login</button>
+                            
                               <button id="loginBtn"><a href="{{url_for('home')}}" style="color: white; text-decoration: none;">Logout</a></button>
-                              <button id="helpBtn">Help</button>
+                              <button id="loginBtn"><a href="{{url_for('userDashboard')}}" style="color: white; text-decoration: none;">View your Orders</a></button>
                               <div class="logo">PixOra</div>
                     </div>
           </nav>
 
           <!-- ======= SIDEBAR MENU ======= -->
           <div class="sidebar" id="sidebar">
-                    <a href="#">Home</a>
-                    <a href="#">Vendors</a>
-                    <a href="#">FAQ</a>
+                     <a href="#" id="close">&#x2715;</a>
+                    <a href="{{url_for('home')}}">Home</a>
+                    <a href="{{url_for('allVendors')}}">Vendors</a>
+                    
 
           </div>
          {% if vendor %}
@@ -498,26 +499,71 @@
                     <div class="package1">
                           <h1>Bronze Package</h1>
                           <h2>One album for RS.{{vendor.package1}}</h2>
-                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze&bill={{vendor.package1}}">BOOK NOW</a>
+
                       </div>
                       <div class="package2">
                           <h1>Platinum Package</h1>
                           <h2>Two album for RS.{{vendor.package2}}</h2>
-                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum&bill={{vendor.package2}}">BOOK NOW</a>
+
                       </div>
                       <div class="package3">
                           <h1>Gold Package</h1>
                           <h2>Three album for RS.{{vendor.package3}}</h2>
-                          <div id = "bookNow"><a href="#">BOOK NOW</a></div>
+                          <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a>
                       </div>
                 </div>
             </div>
 
          {% endif %}
+{% if vendors %}
+            {% for vendor in vendors%}
+            <div class="vendorDiv">
+                <div class="vendorDivFlex">
+                    <div class="left">
+                    <h1>{{vendor.full_name}}</h1>
+                    <h2>{{vendor.date_of_birth}}</h2>
+                    <h2>{{vendor.phone_number}}</h2>
+                    <p>{{vendor.about}}</p>
+                    </div>
+                    
+                     <img src="{{url_for('get_image', image_id=vendor.imageIds[0]) }}" alt="">
+                     
+                </div>
+                <div class="images">
+                     {% for img in vendor.imageIds[1:6] %}
+                    <img src="{{url_for('get_image', image_id=img)}}" alt="">
+                    {% endfor %}
+                </div>
+                <div class="packageSection">
+                    <div class="package1">
+                          <h1>Bronze Package</h1>
+                          <h2>One album for RS.{{vendor.package1}}</h2>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Bronze&bill={{vendor.package1}}">BOOK NOW</a></div>
+                      </div>
+                      <div class="package2">
+                          <h1>Platinum Package</h1>
+                          <h2>Two album for RS.{{vendor.package2}}</h2>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Platinum&bill={{vendor.package2}}">BOOK NOW</a></div>
+                      </div>
+                      <div class="package3">
+                          <h1>Gold Package</h1>
+                          <h2>Three album for RS.{{vendor.package3}}</h2>
+                         <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a></div>
+                      </div>
+                </div>
+            </div>
+
+            {% endfor %}
+{% endif%}
+
+
           <!-- ======= HERO SECTION ======= -->
           <section class="hero">
                     <h1>PIXORA</h1>
                     <p>Discover photographers & videographers who inspire creativity.</p>
+
 
           </section>
 
@@ -564,9 +610,13 @@
           <script>
                     const menuToggle = document.getElementById('menuToggle');
                     const sidebar = document.getElementById('sidebar');
+                    const close = document.getElementById('close');
                     menuToggle.addEventListener('click', () => {
                               sidebar.classList.toggle('active');
                     });
+                    close.addEventListener('click', ()=>{
+                                sidebar.classList.remove('active');
+                    })
 
                     document.getElementById('helpBtn').addEventListener('click', () => {
                               alert("Help section coming soon!");

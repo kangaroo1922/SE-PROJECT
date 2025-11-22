@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel — PixOra</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ----------------- Base Styles ----------------- */
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
+    :root{
+      --bg:#07070c; --card: rgba(255,255,255,0.06); --glass: rgba(255,255,255,0.12);
+      --muted: #bfb8c9; --accent: #7b2ae8; --danger: #ff3b3b;
+    }
+    body{background:var(--bg);color:#fff;min-height:100vh}
+    
+    /* Navbar */
+    .navbar{display:flex;justify-content:space-between;padding:20px 5%;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--glass)}
+    .logo{font-weight:700;font-size:20px;color:var(--accent)}
+    .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:14px}
+    .btn-danger{background:var(--danger)}
+    .btn-outline{background:transparent;border:1px solid var(--glass)}
+
+    /* Layout */
+    .wrap{display:grid;grid-template-columns:250px 1fr;gap:30px;padding:30px 5%}
+    
+    /* Sidebar */
+    .sidebar .nav-item{padding:12px;margin-bottom:8px;border-radius:10px;cursor:pointer;transition:0.2s}
+    .sidebar .nav-item:hover{background:rgba(255,255,255,0.05)}
+    .sidebar .nav-item.active{background:rgba(123,42,232,0.2);color:var(--accent)}
+    
+    /* Content */
+    .card{background:var(--card);border:1px solid var(--glass);border-radius:16px;padding:24px;margin-bottom:20px}
+    table{width:100%;border-collapse:collapse;margin-top:15px}
+    th{text-align:left;color:var(--muted);padding:10px;border-bottom:1px solid var(--glass)}
+    td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    
+    .badge{padding:4px 10px;border-radius:20px;font-size:12px;background:rgba(255,255,255,0.1)}
+    .badge-danger{background:rgba(255,59,59,0.2);color:#ff6b6b}
+    
+    .action-btn{padding:5px 10px;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;margin-right:4px;font-size:12px}
+    .action-btn:hover{background:var(--accent)}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;place-items:center;z-index:100}
+    .modal{background:#1a1a20;padding:30px;border-radius:16px;width:500px;border:1px solid var(--glass)}
+    .modal input{width:100%;padding:10px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;margin-top:5px;margin-bottom:15px}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">PixOra Admin</div>
+    <button class="btn btn-outline" onclick="window.location.href='/'">Logout</button>
+  </nav>
+
+  <div class="wrap">
+    <aside class="sidebar">
+      <div class="nav-item active" onclick="switchView('manage')">Manage Database</div>
+      <div class="nav-item" onclick="switchView('reports')">Reports & Analytics</div>
+      <div class="nav-item" onclick="switchView('fraud')">Fraud Handler</div>
+    </aside>
+
+    <main id="contentArea">
+      <div id="view-manage">
+        <div class="card">
+          <h3>Users</h3>
+          <table id="usersTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Vendors</h3>
+          <table id="vendorsTable">
+            <thead><tr><th>Name</th><th>Revenue</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="view-reports" style="display:none">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Analytics</h3>
+          <button class="btn" onclick="window.location.href='/api/export/vendors.csv'">Download CSV</button>
+        </div>
+        <div class="card" id="chartRevenue" style="height:400px;"></div>
+      </div>
+
+      <div id="view-fraud" style="display:none">
+        <div class="card">
+          <h3>Automated Fraud Prevention</h3>
+          <p style="color:var(--muted);margin-bottom:20px">
+            Identify the highest revenue vendor, seize their funds, block their account, and refund users.
+          </p>
+          <button class="btn btn-danger" onclick="handleFraud()">Trigger Fraud Protocol</button>
+          <div id="fraudLog" style="margin-top:20px;font-family:monospace;color:#bbb"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <script>
+    // Global State
+    let state = { users: [], vendors: [] };
+
+    // --- API Interactions ---
+    async function fetchData() {
+      try {
+        const [uRes, vRes] = await Promise.all([
+          fetch('/api/users'),
+          fetch('/api/vendors')
+        ]);
+        state.users = await uRes.json();
+        state.vendors = await vRes.json();
+        renderAll();
+      } catch (err) {
+        console.error("Failed to fetch data", err);
+      }
+    }
+
+    async function apiCall(url, method, body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(url, opts);
+      return res.json();
+    }
+
+    // --- Render Logic ---
+    function renderAll() {
+      const uBody = document.querySelector('#usersTable tbody');
+      uBody.innerHTML = state.users.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>$${u.balance.toFixed(2)}</td>
+          <td>${u.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
+          <td>
+            <button class="action-btn" onclick="openEditUser('${u.id}')">Edit</button>
+            <button class="action-btn" onclick="toggleBlockUser('${u.id}', ${!u.blocked})">${u.blocked?'Unblock':'Block'}</button>
+            <button class="action-btn" style="color:#ff6b6b" onclick="deleteItem('users','${u.id}')">Del</button>
+          </td>
+        </tr>
+      `).join('');
+
+      const vBody = document.querySelector('#vendorsTable tbody');
+      vBody.innerHTML = state.vendors.map(v => `
+        <tr>
+          <td>${v.name}</td>
+          <td>$${v.revenue.toFixed(2)}</td>
+          <td>⭐ ${v.rating}</td>
+          <td>${v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge">Active</span>'}</td>
+          <td>
+            <button class="action-btn" onclick="openEditVendor('${v.id}')">Edit</button>
+            <button class="action-btn" onclick="toggleBlockVendor('${v.id}', ${!v.blocked})">${v.blocked?'Unblock':'Block'}</button>
+            <button class="action-btn" style="color:#ff6b6b" onclick="deleteItem('vendors','${v.id}')">Del</button>
+          </td>
+        </tr>
+      `).join('');
+
+      renderChart();
+    }
+
+    // --- Actions ---
+    async function toggleBlockUser(id, status) {
+      await apiCall(`/api/users/${id}`, 'PATCH', { blocked: status });
+      fetchData();
+    }
+    
+    async function toggleBlockVendor(id, status) {
+      await apiCall(`/api/vendors/${id}`, 'PATCH', { blocked: status });
+      fetchData();
+    }
+
+    async function deleteItem(type, id) {
+      if(!confirm("Are you sure? This cannot be undone.")) return;
+      await apiCall(`/api/${type}/${id}`, 'DELETE');
+      fetchData();
+    }
+
+    async function handleFraud() {
+      if(!confirm("WARNING: This will block the highest earning vendor and seize their revenue. Proceed?")) return;
+      
+      const res = await apiCall('/api/fraud/handle', 'POST');
+      const log = document.getElementById('fraudLog');
+      
+      if(res.success) {
+        log.innerHTML += `<div style="color:#4ade80;margin-top:5px">
+          [SUCCESS] Seized $${res.extracted} from ${res.vendor}. Refunded ${res.refunded_count} users.
+        </div>`;
+        fetchData();
+      } else {
+        log.innerHTML += `<div style="color:#f87171;margin-top:5px">[ERROR] ${res.error}</div>`;
+      }
+    }
+
+    // --- Modals ---
+    function openEditUser(id) {
+      const u = state.users.find(x => x.id === id);
+      const html = `
+        <h3 style="color:#fff;margin-bottom:15px">Edit User</h3>
+        <label>Email / Username</label>
+        <input id="edit_email" value="${u.email}">
+        <label>Balance</label>
+        <input id="edit_bal" type="number" value="${u.balance}">
+        <div style="text-align:right">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="saveUser('${id}')">Save</button>
+        </div>
+      `;
+      showModal(html);
+    }
+
+    async function saveUser(id) {
+      const email = document.getElementById('edit_email').value;
+      const bal = document.getElementById('edit_bal').value;
+      await apiCall(`/api/users/${id}`, 'PATCH', { email: email, balance: bal });
+      closeModal();
+      fetchData();
+    }
+
+    function openEditVendor(id) {
+      const v = state.vendors.find(x => x.id === id);
+      const html = `
+        <h3 style="color:#fff;margin-bottom:15px">Edit Vendor</h3>
+        <label>Name</label>
+        <input id="edit_vname" value="${v.name}">
+        <label>Revenue</label>
+        <input id="edit_rev" type="number" value="${v.revenue}">
+        <div style="text-align:right">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="saveVendor('${id}')">Save</button>
+        </div>
+      `;
+      showModal(html);
+    }
+
+    async function saveVendor(id) {
+      const name = document.getElementById('edit_vname').value;
+      const rev = document.getElementById('edit_rev').value;
+      await apiCall(`/api/vendors/${id}`, 'PATCH', { name: name, revenue: rev });
+      closeModal();
+      fetchData();
+    }
+
+    function showModal(html) {
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('editModal').style.display = 'grid';
+    }
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    // --- View Switching ---
+    function switchView(viewName) {
+      document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
+      document.getElementById(`view-${viewName}`).style.display = 'block';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+      if(viewName === 'reports') renderChart();
+    }
+
+    // --- Charts ---
+    let myChart = null;
+    function renderChart() {
+      const el = document.getElementById('chartRevenue');
+      if(el.offsetParent === null) return; // Hidden
+      
+      if(myChart) myChart.dispose();
+      myChart = echarts.init(el);
+      
+      myChart.setOption({
+        title: { text: 'Vendor Revenue', textStyle: { color: '#fff' } },
+        tooltip: {},
+        xAxis: { type: 'category', data: state.vendors.map(v => v.name), axisLabel: { color: '#888' } },
+        yAxis: { type: 'value', axisLabel: { color: '#888' } },
+        series: [{
+          type: 'bar',
+          data: state.vendors.map(v => v.revenue),
+          itemStyle: { color: '#7b2ae8' }
+        }]
+      });
+    }
+
+    // Init
+    fetchData();
+  </script>
+</body>
+</html>

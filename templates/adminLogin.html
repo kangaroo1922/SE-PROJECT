@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html>
     <head >
-        <title>USER LOGIN</title>
-        
+        <title>ADMIN LOGIN</title>
 <style>
-
 
 body{
     font-family: sans-serif;
-    
-    
 }
 #container{
-   
    display: flex;
    flex-direction: column;
-   background-image: url('/static/userBack.jpg');
+   background-image: url('/static/back.jpg');
    background-repeat: no-repeat;
    background-size: cover;
 }
-#container > *{
-    color: white;
-}
+
 h1{
     text-align: center;
     font-weight: 50;
     color: white;
     padding-top: 5%;
 }
+
 #loginBox{
     text-align: center;
     font-weight: 10px;
-    
     width : 250px;
     margin: 5% auto 20% auto;
     height: 200px;
@@ -41,8 +34,6 @@ h1{
 #loginBox > label, input, button{
     margin: 5% 5% 5% 5%;
     color: white;
-   
-    
 }
 
 #userName, #password , #loginButton{
@@ -52,14 +43,14 @@ h1{
     font-weight: 10px;
     background: none;
     height: 30px;
-
 }
+
 #userName:hover, #password:hover , #loginButton:hover{
     background-color: none;
     color: white;
     transition-delay: 0.1s;
-    transition-property: smooth;
 }
+
 .navbar , .footer{
     background-color: black;
     height: 100px;
@@ -71,24 +62,18 @@ h1{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    border-radius:0 0 20% 20%;
     justify-items: end;
     align-items: center;
-    
 }
 
-
 .navbar > button, #slidebar{
-    
     color: white;
     font-size: 30px;
     background: none;
     border: none;
     margin: 35px 20px 35px 20px;
-    
 }
 .navbar > h1{
-  
     padding-bottom:5%;
     padding-right: 1%;
     text-align: right;
@@ -103,34 +88,23 @@ h1{
     top:-100%;
     transition: top 0.4s ease;
     margin:100px 0 0 5%;
-    
 }
 #submenu > a , #submenu1 > a{
     text-decoration: none;
     color: white;
     font-size: 15px;
-    font-weight: 2px;
     padding-top: 10px;
     text-align: justify;
-    width: auto;
     height:20px;
     padding-left: 10px;
-    padding-right: 10px;
 }
-#menuButton{
-    text-align: left;
-}
-#submenu > a:hover , #submenu1 > a:hover{
-    background-color: grey;
-    color: white;
-    border-radius: 10px;
-}
+
 #submenu.active , #submenu1.active{
     top:0;
     color: white;
     font-size: 30px;
-
 }
+
 #slidebar{
     width: 50%;
     position: fixed;
@@ -141,32 +115,26 @@ h1{
     left:0;
     color: white;
     margin-left: 10%;
-
-   
 }
 #slidebar > a{
     text-decoration: none;
     font-size: 20px;
     color: white;
-    font-weight: 1;
     padding:4px;
 }
 #slidebar > a:hover{
     background-color: grey;
     border-radius: 10px;
-    
 }
 
 .footer{
-    position: relative;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 30px 0;
     width: 100%;
-    margin-bottom: 0;
-    bottom: 0;
-    border-radius: 20% 20% 0 0;
+    font-size: 14px;
 }
-
-
-
 </style>
 
     </head>
@@ -174,7 +142,6 @@ h1{
     <body style="margin: 0;">
             
             <div class="navbar" >
-            
                 <button id = "menuButton">&#9881;</button>
                 <h1>PixOra</h1>
                 <div id="slidebar">
@@ -186,67 +153,61 @@ h1{
                     <a href="#" id = "dropDown1">Sign Up</a>
                 </div>
             </div>
-             <div id = "submenu">
-                        <a href="{{url_for('userLogin')}}">User Login</a>
-                        <a href="{{url_for('adminLogin')}}">Admin Login</a>
-                        <a href="{{url_for('vendor_login')}}">Vendor Login</a>
+
+            <div id = "submenu">
+                <a href="{{url_for('userLogin')}}">User Login</a>
+                <a href="{{url_for('adminLogin')}}">Admin Login</a>
+                <a href="{{url_for('vendor_login')}}">Vendor Login</a>
             </div>
-             <div id = "submenu1">
-                        <a href="{{url_for('userSignUp')}}">User Signup</a>
-                        <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
+
+            <div id = "submenu1">
+                <a href="{{url_for('userSignUp')}}">User Signup</a>
+                <a href="{{url_for('vendor_signup')}}">Vendor Signup</a>
             </div>
+
             <div id="container">
-                <h1 style="font-weight:400;">PixOra</h1>
-                 <h1 style="font-weight:400;">Welcome to the user login page!</h1>
-                <form id = "loginBox" action="/userLogin" method="POST">
-                    <label for="userName">Username </label>
-                    <input type="text" id = "userName" name="userName" placeholder="Enter your username">
+                <h1>Welcome to the Admin Login Page!</h1>
+
+                <form id="loginBox" action="/adminLogin" method="POST">
+                    <label for="userName">Enter Username: </label>
+                    <input type="text" id="userName" name="userName" placeholder="Enter admin username">
                     <br>
-                    <label for="password">Password </label>
-                    <input type="text" id = "password" name = "password" placeholder="Enter your password">
+                    <label for="password">Password: </label>
+                    <input type="password" id="password" name="password" placeholder="Enter password">
                     <button id="loginButton" type="submit">LOG IN</button>
-                    {% if message %}
-                    <p style="color: white; background-color: gray; text-align:center; padding:10px; border-radius: 20px;">{{ message }}</p>
-                    {% endif %}
-                </div>
+                
             </div>
-                <div class="footer"></div>
+
+       <div class="footer">
+    <p>© 2025 PixOra — Capture Your Moments</p>
+</div>
         
-            <script>
+<script>
 
+    const button = document.getElementById('menuButton');
+    const bar = document.getElementById('slidebar');
+    const drop = document.getElementById('dropDown');
+    const submenu = document.getElementById('submenu');
+    const drop1 = document.getElementById('dropDown1');
+    const submenu1 = document.getElementById('submenu1');
 
-//from the first file
-const button = document.getElementById('menuButton');
-const bar = document.getElementById('slidebar');
-const drop = document.getElementById('dropDown');
-const submenu = document.getElementById('submenu');
-const login = document.getElementById('loginButton');
-const drop1 = document.getElementById('dropDown1');
-const submenu1 = document.getElementById('submenu1');
-button.addEventListener('click' , ()=> {
-    bar.classList.toggle('active');
-    submenu.classList.remove('active');
-    submenu1.classList.remove('active');
+    button.addEventListener('click' , ()=> {
+        bar.classList.toggle('active');
+        submenu.classList.remove('active');
+        submenu1.classList.remove('active');
+    });
 
-});
+    drop.addEventListener('click' , ()=>{
+        submenu.classList.toggle('active');
+        submenu1.classList.remove('active');
+    });
 
-drop.addEventListener('click' , ()=>{
-submenu.classList.toggle('active')
-submenu1.classList.remove('active');
+    drop1.addEventListener('click' , ()=>{
+        submenu1.classList.toggle('active');
+        submenu.classList.remove('active');
+    });
 
-});
-drop1.addEventListener('click' , ()=>{
-submenu1.classList.toggle('active')
-submenu.classList.remove('active');
-});
-login.addEventListener('click' , ()=>{
-    let password = document.getElementById('password').value;
-    let username = document.getElementById('username').value;
-});
-
-
-
-            </script>
+</script>
  
     </body>
 
