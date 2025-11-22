@@ -15,7 +15,7 @@
 
         body {
             background-color: #ebe7f0;
-            background-image: url('download.jfif');
+            background-image: url('/static/download.jpeg');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
@@ -25,81 +25,78 @@
             overflow-x: hidden;
         }
 
-        /* NAVBAR */
-        .navbar {
-            width: 100%;
-            padding: 20px 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+     .navbar {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      background-color: black;
+      height: 100px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      z-index: 80;
+    }
+    .navbar > button, .navbar h1, #slidebar {
+      color: white;
+      font-size: 30px;
+      background: none;
+      border: none;
+      margin: 35px 20px;
+    }
+    .navbar h1 {
+      font-weight: 600;
+      text-align: right;
+      width: 10%;
+      padding-right: 1%;
+    }
 
-        .navbar h1 {
-            font-weight: 300;
-            font-size: 28px;
-            letter-spacing: 3px;
-            color: #b399ff;
-            text-transform: uppercase;
-        }
+    #slidebar{
+      width: 20%;
+      position: fixed;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      left: -100%;
+      top: 0;
+      height: 100px;
+      background: none;
+      transition: left 0.4s ease;
+      z-index: 90;
+    }
+    #slidebar.active { left: 0; color: white; margin-left: 10%; }
 
-        .menu {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    #slidebar > a{
+      display: block;
+      text-decoration: none;
+      font-size: 20px;
+      color: white;
+      font-weight: 400;
+      padding: 0px 0px;
+      height: 30px;
+    }
+    #slidebar > a:hover { background-color: grey; border-radius: 10px; }
 
-        #button {
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        #button:hover {
-            transform: rotate(90deg);
-        }
-
-        #slidebar {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            height: 100vh;
-            width: 250px;
-            background: rgba(10, 10, 25, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: left 0.5s ease;
-            z-index: 100;
-        }
-
-        #slidebar.active {
-            left: 0;
-        }
-
-        #slidebar a {
-            color: #cbb4ff;
-            padding: 12px;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        #slidebar a:hover {
-            color: white;
-            background: rgba(119, 0, 255, 0.3);
-            border-radius: 5px;
-        }
+    #submenu, #submenu1 {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: -100%;
+      left: 5%;
+      transition: top 0.4s ease;
+      margin: 100px 0 0 5%;
+      z-index: 95;
+      background: rgba(0,0,0,0.85);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    #submenu > a, #submenu1 > a {
+      text-decoration: none;
+      color: white;
+      font-size: 15px;
+      padding: 8px 10px;
+    }
+    #submenu > a:hover, #submenu1 > a:hover { background-color: grey; border-radius: 6px; }
+    #submenu.active, #submenu1.active { top: 100px; }
 
         /* HERO SECTION */
         .hero {
@@ -180,7 +177,7 @@
         .mission:hover,
         .values:hover {
             transform: translateY(-10px);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(178, 148, 208, 0.85);
             box-shadow: 0 0 30px rgba(86, 68, 103, 0.4);
         }
 
@@ -222,7 +219,7 @@
             justify-content: space-between;
             margin: 70px auto;
             padding: 50px;
-            background: rgba(213, 195, 231, 0.85);
+            background: rgba(178, 148, 208, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 20px rgba(115, 76, 134, 0.3);
             border-radius: 0;
@@ -278,15 +275,40 @@
             text-align: justify;
             line-height: 1.8;
         }
+.pixora-footer {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: Arial, sans-serif;
+}
 
-        /* FOOTER */
-        .footer {
-            width: 100%;
-            height: 100px;
-            background: rgba(0, 0, 20, 0.9);
-            border-top: 1px solid #929094;
-            margin-top: 100px;
-        }
+.pixora-footer h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.pixora-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.footer-links a {
+  color: #aaa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-links {
+  margin: 15px 0;
+}
 
         /* ANIMATIONS */
         @keyframes fadeIn {
@@ -332,6 +354,7 @@
 </head>
 
 <body>
+<button id = "menuButton">&#9881;</button>
 
     <div class="navbar">
         <div class="menu">
@@ -434,6 +457,20 @@
             bar.classList.toggle('active');
         });
     </script>
+      <footer class="pixora-footer">
+  <div class="footer-content">
+    <p>Built with love for creators.</p>
+
+    <div class="footer-links">
+    <a href="mailto:i232008@isb.nu.edu.pk">Contact</a>
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms') }}">Terms</a>
+    </div>
+
+    <p class="copyright">© 2025 Pixora. All Rights Reserved.</p>
+  </div>
+</footer>
+
 </body>
 
 </html>

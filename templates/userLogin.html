@@ -15,7 +15,7 @@ body{
    
    display: flex;
    flex-direction: column;
-   background-image: url('/static/userBack.jpg');
+   background-image: url('/static/back.jpg');
    background-repeat: no-repeat;
    background-size: cover;
 }
@@ -71,7 +71,6 @@ h1{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    border-radius:0 0 20% 20%;
     justify-items: end;
     align-items: center;
     
@@ -156,15 +155,40 @@ h1{
     border-radius: 10px;
     
 }
-
-.footer{
-    position: relative;
-    width: 100%;
-    margin-bottom: 0;
-    bottom: 0;
-    border-radius: 20% 20% 0 0;
+.pixora-footer {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: Arial, sans-serif;
 }
 
+.pixora-footer h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.pixora-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.footer-links a {
+  color: #aaa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-links {
+  margin: 15px 0;
+}
 
 
 </style>
@@ -210,7 +234,20 @@ h1{
                     {% endif %}
                 </div>
             </div>
-                <div class="footer"></div>
+               <footer class="pixora-footer">
+  <div class="footer-content">
+    <p>Built with love for creators.</p>
+
+    <div class="footer-links">
+    <a href="mailto:i232008@isb.nu.edu.pk">Contact</a>
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms') }}">Terms</a>
+    </div>
+
+    <p class="copyright">© 2025 Pixora. All Rights Reserved.</p>
+  </div>
+</footer>
+
         
             <script>
 

@@ -135,6 +135,40 @@ h1{
     width: 100%;
     font-size: 14px;
 }
+.pixora-footer {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: Arial, sans-serif;
+}
+
+.pixora-footer h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.pixora-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.footer-links a {
+  color: #aaa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-links {
+  margin: 15px 0;
+}
 </style>
 
     </head>
@@ -177,10 +211,6 @@ h1{
                     <button id="loginButton" type="submit">LOG IN</button>
                 
             </div>
-
-       <div class="footer">
-    <p>© 2025 PixOra — Capture Your Moments</p>
-</div>
         
 <script>
 
@@ -208,7 +238,18 @@ h1{
     });
 
 </script>
- 
-    </body>
+   <footer class="pixora-footer">
+  <div class="footer-content">
+    <p>Built with love for creators.</p>
 
+    <div class="footer-links">
+    <a href="mailto:i232008@isb.nu.edu.pk">Contact</a>
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms') }}">Terms</a>
+    </div>
+
+    <p class="copyright">© 2025 Pixora. All Rights Reserved.</p>
+  </div>
+</footer>
+    </body>
 </html>

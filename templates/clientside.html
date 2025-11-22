@@ -381,6 +381,7 @@
                     footer {
                               text-align: center;
                               padding: 30px 0;
+                              background-color: #0a0c10;
                               color: var(--text-muted);
                               font-size: 13px;
                               border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -445,6 +446,40 @@
                         
                       }
                     }
+                    .pixora-footer {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: Arial, sans-serif;
+}
+
+.pixora-footer h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.pixora-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.footer-links a {
+  color: #aaa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-links {
+  margin: 15px 0;
+}
           </style>
 </head>
 
@@ -572,28 +607,28 @@
                     <h2>Top Rated Vendors</h2>
                     <div class="vendor-grid" id="vendorGrid">
                               <div class="vendor-card">
-                                        <img src="download.jfif" alt="Luma Studios">
+                                        <img src="/static/luma.jpeg" alt="Luma Studios">
 
                                         <div class="vendor-info">
                                                   <h3>Luma Studios</h3>
-                                                  <p>Weddings & Portraits</p>
+                                                  <p>Brand shoots & Portraits</p>
                                                   <span>4.9★</span>
                                         </div>
                               </div>
                               <div class="vendor-card">
-                                        <img src="image.jfif" alt="FrameCraft">
+                                        <img src="/static/frame.jpeg" alt="FrameCraft">
                                         <div class="vendor-info">
                                                   <h3>FrameCraft</h3>
-                                                  <p>Candid & Commercial</p>
+                                                  <p>Weddings & Events</p>
                                                   <span>4.8★</span>
                                         </div>
                               </div>
                               <div class="vendor-card">
-                                        <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?w=1200&q=60"
+                                        <img src="/static/silverlens.jpeg"
                                                   alt="Silver Lens">
                                         <div class="vendor-info">
                                                   <h3>Silver Lens</h3>
-                                                  <p>Events & Films</p>
+                                                  <p>Films & Commercial</p>
                                                   <span>4.7★</span>
                                         </div>
                               </div>
@@ -601,10 +636,19 @@
           </section>
 
           <!-- ======= FOOTER ======= -->
-          <footer>
+          <footer class="pixora-footer">
+  <div class="footer-content">
+    <p>Built with love for creators.</p>
 
-                    © 2025 PixOra — Designed for innovation & creativity.
-          </footer>
+    <div class="footer-links">
+    <a href="mailto:i232008@isb.nu.edu.pk">Contact</a>
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms') }}">Terms</a>
+    </div>
+
+    <p class="copyright">© 2025 Pixora. All Rights Reserved.</p>
+  </div>
+</footer>
 
           <!-- ======= JS ======= -->
           <script>

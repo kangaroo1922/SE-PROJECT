@@ -10,7 +10,10 @@ import bcrypt
 import csv, io, os, datetime
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Replace with a strong secret key!
-client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
+from urllib.parse import quote_plus
+
+password = quote_plus("zktQ@xud36XNaPZ")
+client = MongoClient(f"mongodb+srv://zuhanu:{password}@cluster0.9ynwvoj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client["wholeDB"]
 vendors = db["vendor_credentials"]
 users = db["user_credentials"]
@@ -19,6 +22,13 @@ userOrder = db["order_details"]
 admin_collection = db["admin_collection"]
 fraud_logs_col = db["fraudLogs"]
 fs = gridfs.GridFS(db)
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 @app.route("/profile/<vendor_id>")
 def profile(vendor_id):
     vendor = vendorBio.find_one({"vendor_id": vendor_id})
