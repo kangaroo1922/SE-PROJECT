@@ -333,6 +333,7 @@
                       background-color: hsl(265, 87%, 26%);
                       border-radius: 10px;
                       padding: 5px;
+                      padding: 20px;
               
                     }
                     .packageSection > div:hover{
@@ -419,6 +420,37 @@
 .footer-links {
   margin: 15px 0;
 }
+/* Wrapper for sliding effect */
+.panes-wrapper {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+/* Individual pane (images, packages, reviews) */
+.panes-wrapper .pane {
+    flex: 0 0 100%;
+    transition: transform 0.5s ease;
+}
+
+/* Active class used for controlling which pane is visible */
+.panes-wrapper .pane.active {
+    /* active pane is visible at position 0 */
+    transform: translateX(0);
+}
+
+/* hidden panes slide out */
+.panes-wrapper .pane.inactive-left {
+    transform: translateX(-100%);
+}
+
+.panes-wrapper .pane.inactive-right {
+    transform: translateX(100%);
+}
+
                     
                     .imageSection{
                       width: 100%;
@@ -502,9 +534,9 @@
                               <h1 class="brand">PixOra</h1>
                     </div>
                     <nav class="profile-actions">
-                              <button class="ghost">Help</button>
+                             
                               <button class="ghost"><a href="{{url_for('home')}}" style="text-decoration: none; color: white;">Logout</a></button>
-                              <button class="ghost">Sign Up</button>
+                              <button class="ghost"><a href="{{url_for('vendorDashboard')}}" style="text-decoration: none; color: white;">View Orders</a></button>
                               <button class="primary"><a href="{{url_for('vendorPanelUpdateBio')}}" style="text-decoration: none; color: white;">Update Profile</a></button>
                     </nav>
           </header>
@@ -520,24 +552,20 @@
                                         </div>
                                         <div class="vendor-meta">
                                                   <h2 id="vendorName">{{vendor["full_name"]}}</h2>
-                                                  <p id="vendorLocation" class="muted">Lahore, Pakistan • Wedding
-                                                            Photographer</p>
+                                                  <p id="vendorLocation" class="muted">Phone Number: {{vendor.phone_number}}</p>
                                                   <div class="meta-stats">
-                                                            <div><strong id="rating">4.8</strong> <span
-                                                                                class="muted">/5</span></div>
-                                                            <div><strong id="ordersCount">124</strong> <span
-                                                                                class="muted">Bookings</span></div>
-                                                            <div><strong id="since">2019</strong> <span
-                                                                                class="muted">since</span></div>
+                                                            <div><strong id="likes">{{vendor.likes}}</strong> <span
+                                                                                class="muted"> likes</span></div>
+                                                            <div><strong id="dislikes">{{vendor.dislikes}}</strong> <span
+                                                                                class="muted">dislikes</span></div>
+                                                            <div><strong id="since">{{vendor.orders_completed}}</strong> <span
+                                                                                class="muted">orders completed</span></div>
                                                   </div>
                                         </div>
                               </div>
 
-                              <div class="hero-right">
-                                        <div class="action-row">
-                                                  <button id="followBtn" class="ghost">Follow</button>
-                                                  <button id="shareBtn" class="ghost">Share</button>
-                                        </div>
+                           
+                                       
                                         <p id="vendorShort" class="description">
                                                   {{vendor["about"]}}
                                         </p>
@@ -550,7 +578,13 @@
                               <button data-tab="reviews" class="tab">Reviews</button>
                               <div class="tab-ink"></div>
                     </section>
-                    <div class="imageSection">
+
+
+
+              <section class="content">
+                <div class="panes-wrapper">
+                    <div id="images" class="pane active">
+                          <div class="imageSection">
                             {% if image_ids|length > 0 %}
                              <img  src ="{{ url_for('get_image', image_id=image_ids[1]) }}" alt="Portfolio image">
                             {% endif %}
@@ -568,9 +602,14 @@
                             {% endif %}
 
                     </div>
-                    {% if vendor %}
+                    </div>
 
-                    <h1 style="text-align: center; margin-top: 20px;">PACKAGES</h1>
+                    <div id="packages" class="pane inactive-right">
+                       <h1 style="text-align: center; margin-top: 20px; margin-bottom: 30px;">PACKAGES</h1>
+                        <div class="packages-grid" id="packagesGrid">
+                                              {% if vendor %}
+
+                   
                     <div class="packageSection" >
                       <div class="package1">
                           <h1>Bronze Package</h1>
@@ -588,6 +627,31 @@
                     </div>
 
                     {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="reviews" class="pane inactive-right">
+                        <div class="reviews-list" id="reviewsList">
+{% if vendor.reviews and vendor.reviews|length > 0 %}
+    <div class="reviews-list">
+        {% for review in vendor.reviews %}
+            <div class="review">
+                <div class="meta">
+                </div>
+                <p style="background-color: #111; padding: 10px; height: auto; border-radius: 5px;">{{ review }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No reviews yet.</p>
+{% endif %}
+
+
+                        </div>
+                    </div>
+                </div>
+</section>
+
                     <section class="content">
                               <div id="images" class="pane active">
                                   
@@ -609,156 +673,39 @@
                     <small class="muted">© PixOra • Dark chic demo</small>
           </footer>
 
-          <script>
-                    /*const vendor = {
-                              name: "Weddings",
-                              location: "Lahore, Pakistan",
-                              avatar: "https://placehold.co/600x600/png?text=Aisha",
-                              rating: 4.8,
-                              orders: 124,
-                              since: 2019,
-                              short: "Elegant wedding photography, candid and editorial style. Travel available across Pakistan.",
-                              images: [
-                                        "https://placehold.co/800x600/png?text=Shot+1",
-                                        "https://placehold.co/800x600/png?text=Shot+2",
-                                        "https://placehold.co/800x600/png?text=Shot+3",
-                                        "https://placehold.co/800x600/png?text=Shot+4",
-                                        "https://placehold.co/800x600/png?text=Shot+5",
-                                        "https://placehold.co/800x600/png?text=Shot+6"
-                              ],
-                              packages: [
-                                        { title: "Silver Package", price: "PKR 45,000", features: ["6 hrs coverage", "200 edited photos", "1 shooter"], tag: "Popular" },
-                                        { title: "Gold Package", price: "PKR 80,000", features: ["10 hrs coverage", "500 edited photos", "2 shooters", "Album"], tag: "Best value" },
-                                        { title: "Elopement", price: "PKR 30,000", features: ["3 hrs coverage", "50 edited photos", "online gallery"], tag: "Mini" }
-                              ],
-                              reviews: [
-                                        { name: "Hassan", rating: 5, date: "Oct 2024", text: "Perfect! Amazing capture of our day, professional and kind." },
-                                        { name: "Zara", rating: 4.5, date: "Mar 2024", text: "Loved the candid shots. Turnaround time was quick." },
-                                        { name: "Rana", rating: 4, date: "Jan 2024", text: "Great talent, will recommend!" }
-                              ]
-                    };
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panes = document.querySelectorAll('.pane');
 
-                    document.addEventListener("DOMContentLoaded", () => {
-                              const menuBtn = document.getElementById("menuBtn");
-                              const nav = document.querySelector(".profile-actions");
-                              menuBtn.addEventListener("click", () => nav.classList.toggle("active"));
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('data-tab');
 
-                              document.getElementById("vendorName").textContent = vendor.name;
-                              document.getElementById("vendorLocation").textContent = `${vendor.location} • Photographer`;
-                              document.getElementById("vendorAvatar").src = vendor.avatar;
-                              document.getElementById("rating").textContent = vendor.rating;
-                              document.getElementById("ordersCount").textContent = vendor.orders;
-                              document.getElementById("since").textContent = vendor.since;
-                              document.getElementById("vendorShort").textContent = vendor.short;
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
 
-                              const gallery = document.getElementById("gallery");
-                              vendor.images.forEach((src, idx) => {
-                                        const tile = document.createElement("div");
-                                        tile.className = "tile";
-                                        tile.innerHTML = `
-          <img src="${src}" alt="Vendor image ${idx + 1}">
-          <div class="tile-info">Shot ${idx + 1} • ${vendor.name}</div>`;
-                                        tile.addEventListener("click", () => openLightbox(idx));
-                                        gallery.appendChild(tile);
-                              });
+        panes.forEach(pane => {
+            if(pane.id === targetId) {
+                pane.classList.remove('inactive-left', 'inactive-right');
+                pane.classList.add('active');
+            } else {
+                // Determine slide direction
+                const paneIndex = Array.from(panes).indexOf(pane);
+                const targetIndex = Array.from(panes).findIndex(p => p.id === targetId);
+                if(paneIndex < targetIndex){
+                    pane.classList.remove('active');
+                    pane.classList.add('inactive-left');
+                } else {
+                    pane.classList.remove('active');
+                    pane.classList.add('inactive-right');
+                }
+            }
+        });
+    });
+});
+</script>
 
-                              const packagesGrid = document.getElementById("packagesGrid");
-                              vendor.packages.forEach(pkg => {
-                                        const card = document.createElement("div");
-                                        card.className = "package";
-                                        card.innerHTML = `
-          <h3>${pkg.title} <small class="muted">• ${pkg.tag}</small></h3>
-          <div class="price">${pkg.price}</div>
-          <div class="features">${pkg.features.join(" · ")}</div>
-          <div class="cta">
-            <button class="ghost" onclick="viewDetails('${pkg.title}')">Details</button>
-            <button class="primary" onclick="bookNow('${pkg.title}')">Book</button>
-          </div>`;
-                                        packagesGrid.appendChild(card);
-                              });
-
-                              const reviewsList = document.getElementById("reviewsList");
-                              vendor.reviews.forEach(r => {
-                                        const rev = document.createElement("div");
-                                        rev.className = "review";
-                                        rev.innerHTML = `
-          <div class="meta"><strong>${r.name}</strong><span class="muted">• ${r.date}</span></div>
-          <div class="stars">${"★".repeat(Math.floor(r.rating))}${r.rating % 1 ? "½" : ""} <span class="muted">· ${r.rating}/5</span></div>
-          <p style="margin:6px 0 0 0">${r.text}</p>`;
-                                        reviewsList.appendChild(rev);
-                              });
-
-                              const tabs = Array.from(document.querySelectorAll(".tab"));
-                              const tabInk = document.querySelector(".tab-ink");
-                              const panes = Array.from(document.querySelectorAll(".pane"));
-
-                              function activateTab(tBtn) {
-                                        tabs.forEach(t => t.classList.remove("active"));
-                                        tBtn.classList.add("active");
-                                        panes.forEach(p => p.classList.remove("active"));
-                                        document.getElementById(tBtn.dataset.tab).classList.add("active");
-                                        const index = tabs.indexOf(tBtn);
-                                        const left = tabs.slice(0, index).reduce((acc, el) => acc + el.offsetWidth, 0);
-                                        tabInk.style.width = `${tBtn.offsetWidth}px`;
-                                        tabInk.style.transform = `translateX(${left}px)`;
-                              }
-
-                              tabs.forEach(t => {
-                                        t.addEventListener("click", () => activateTab(t));
-                              });
-
-                              setTimeout(() => {
-                                        const active = document.querySelector(".tab.active");
-                                        if (active) activateTab(active);
-                              }, 50);
-
-                              const lb = createLightbox();
-                              function openLightbox(idx) {
-                                        lb.open(vendor.images, idx);
-                              }
-
-                              window.viewDetails = (title) => alert(`Open details for ${title} (replace with modal)`);
-                              window.bookNow = (title) => alert(`Booking ${title} — integrate with your booking flow`);
-                    });
-
-                    function createLightbox() {
-                              const overlay = document.createElement("div");
-                              overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;transition:opacity .24s;";
-                              overlay.innerHTML = `<div style="max-width:90%;max-height:90%;position:relative;">
-      <button id="lbClose" style="position:absolute;right:-12px;top:-12px;background:#111;border:none;color:#fff;padding:10px;border-radius:50%;cursor:pointer;font-size:18px">✕</button>
-      <img id="lbImg" style="max-width:100%;max-height:100%;border-radius:10px;display:block" alt="lightbox">
-    </div>`;
-                              document.body.appendChild(overlay);
-                              const lbImg = overlay.querySelector("#lbImg");
-                              const close = overlay.querySelector("#lbClose");
-                              close.addEventListener("click", () => closeLB());
-                              overlay.addEventListener("click", (e) => {
-                                        if (e.target === overlay) closeLB();
-                              });
-                              let images = [], current = 0;
-                              function open(imgs, idx = 0) {
-                                        images = imgs; current = idx;
-                                        lbImg.src = images[current];
-                                        overlay.style.opacity = "1";
-                                        overlay.style.pointerEvents = "auto";
-                                        overlay.style.display = "flex";
-                              }
-                              function closeLB() {
-                                        overlay.style.opacity = "0";
-                                        overlay.style.pointerEvents = "none";
-                                        setTimeout(() => overlay.style.display = "none", 240);
-                              }
-                              window.addEventListener("keydown", (e) => {
-                                        if (overlay.style.display === 'flex') {
-                                                  if (e.key === 'ArrowRight') { current = (current + 1) % images.length; lbImg.src = images[current]; }
-                                                  if (e.key === 'ArrowLeft') { current = (current - 1 + images.length) % images.length; lbImg.src = images[current]; }
-                                                  if (e.key === 'Escape') closeLB();
-                                        }
-                              });
-                              return { open, close: closeLB };
-                    }
-          */</script>
-  <footer class="pixora-footer">
+  <footer class="pixora-footer" style="width: 100%;">
   <div class="footer-content">
     <p>Built with love for creators.</p>
 

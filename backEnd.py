@@ -13,7 +13,7 @@ app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 from urllib.parse import quote_plus
 
 password = quote_plus("zktQ@xud36XNaPZ")
-client = MongoClient(f"mongodb+srv://zuhanu:{password}@cluster0.9ynwvoj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
 db = client["wholeDB"]
 vendors = db["vendor_credentials"]
 users = db["user_credentials"]
@@ -98,11 +98,39 @@ def userLogin():
         else:
             return render_template('userLogin.html', message="Login failed, incorrect password or username")
     return render_template('userLogin.html' , message=None)
+@app.route('/top_vendors')
+def top_vendors():
+    # Sort by likes (descending) and get only 3 vendors
+    top_vendors = vendorBio.find().sort("likes", -1).limit(3)
 
+    return render_template("clientside.html", VENDORS=top_vendors)
+
+@app.route('/reviewSection', methods=['POST'])
+def reviewSection():
+    vendor_id = request.form["vendor_id"]
+    rating = request.form.get("rating")  # <-- FIX: safe get
+
+    if rating in ["like", "dislike"]:
+        update_field = "likes" if rating == "like" else "dislikes"
+        vendorBio.update_one(
+            {"vendor_id": vendor_id},
+            {"$inc": {update_field: 1}}
+        )
+
+    # Handle optional text review
+    about = request.form.get("about")
+    if about:
+        vendorBio.update_one(
+            {"vendor_id": vendor_id},
+            {"$push": {"reviews": about}}
+        )
+    top_vendors = list(vendorBio.find().sort("likes", -1).limit(3))
+    return render_template('clientside.html', message="review submitted", VENDORS = top_vendors)
 
 @app.route('/clientside' , methods=['GET' , 'POST'])
 def clientside():
-    return render_template('clientside.html',message=None)
+    top_vendors = list(vendorBio.find().sort("likes", -1).limit(3))
+    return render_template("clientside.html", VENDORS=top_vendors)
 
 
 
@@ -111,7 +139,9 @@ def getContent(vendorId):
     vendor = vendorBio.find_one({"_id": ObjectId(vendorId)})
     imageIds = vendor.get("images" , [])
     imageIds = [str(i) for i in imageIds]
-    return render_template('clientside.html' , vendor = vendor, imageIds=imageIds)
+    top_vendors = list(vendorBio.find().sort("likes", -1).limit(3))
+   
+    return render_template('clientside.html' , vendor = vendor, imageIds=imageIds, VENDORS = top_vendors)
 
 
 @app.route('/search', methods=['GET' , 'POST'])
@@ -129,8 +159,8 @@ def allVendors():
     for v in allVendors:
         v["imageIds"] = v.get("images", [])
 
-
-    return render_template("clientside.html", vendors=allVendors)
+    top_vendors = list(vendorBio.find().sort("likes", -1).limit(3))
+    return render_template("clientside.html", vendors=allVendors, VENDORS = top_vendors)
 
 
 @app.route('/bookingpanel', methods=['GET', 'POST'])
@@ -192,46 +222,49 @@ def booking_details():
 
 @app.route('/updateOrders', methods=['POST'])
 def updateOrders():
+    total_accepted_orders = 0
+    total_revenue = 0
+
     for key, value in request.form.items():
         if key.startswith("state_"):
             order_id = key.replace("state_", "")
-            state = value  # accept OR reject
+            state = value  # 'accept' or 'reject'
 
-            # Update order state
+            # Update order state in order_details
             db['order_details'].update_one(
                 {"_id": ObjectId(order_id)},
                 {"$set": {"state": state}}
             )
 
-            # If accepted → update vendor revenue
             if state == "accept":
+                total_accepted_orders += 1
 
-                # Extract bill value from form
+                # Sum the bill amounts
                 bill_key = f"bill_{order_id}"
                 bill_str = request.form.get(bill_key, "0")
                 try:
                     bill_amount = float(bill_str)
                 except ValueError:
                     bill_amount = 0
-                print("Bill received:", bill_amount)
+                total_revenue += bill_amount
 
-                # Extract vendor_id from form
-                vendor_key = f"vendor_{order_id}"
-                vendor_id = request.form.get(vendor_key)
-                print(vendor_id)
-                print("Vendor ID received:", vendor_id)
-                vendor_doc = db['vendor_biodata'].find_one({"vendor_id": vendor_id})
-                currentRevenue = vendor_doc.get("revenue", 0)
-                totalRevenue = currentRevenue + bill_amount
-                if vendor_id and bill_amount > 0:
-                    # Increment revenue in vendorBio
-                    result = db['vendor_biodata'].update_one(
-                        {"vendor_id": vendor_id},
-                        {"$inc": {"revenue": totalRevenue}}
-                    )
-                    print("Revenue update matched:", result.matched_count, "modified:", result.modified_count)
+    # Update vendor info once per submission
+    if total_accepted_orders > 0:
+        # Assuming all orders belong to the same vendor for this batch,
+        # take vendor_id from the first accepted order
+        for key, value in request.form.items():
+            if key.startswith("state_") and value == "accept":
+                first_order_id = key.replace("state_", "")
+                vendor_id = request.form.get(f"vendor_{first_order_id}")
+                break
+
+        db['vendor_biodata'].update_one(
+            {"vendor_id": vendor_id},
+            {"$inc": {"orders_completed": total_accepted_orders, "revenue": total_revenue}}
+        )
 
     return redirect(url_for('vendorDashboard'))
+
 
 
 
@@ -394,7 +427,7 @@ def create_admin():
         print("Admin already exists.")
 @app.route('/adminLogin', methods=['GET', 'POST'])
 def adminLogin():
-    create_admin()
+    #create_admin()
     if request.method == 'POST':
         username = request.form.get('userName')
         password = request.form.get('password')

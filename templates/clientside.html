@@ -480,6 +480,29 @@
 .footer-links {
   margin: 15px 0;
 }
+  .haha  button {
+    font-size: 24px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-radius: 8px;
+  }
+  .haha button:hover {
+    font-size: 30px;
+  }
+  .haha{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  #saySum{
+    background:none;
+    border-radius: 5px;
+    color: wheat;
+    border:1px solid white;
+    padding: 10px;
+  }
           </style>
 </head>
 
@@ -549,6 +572,24 @@
                           <a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a>
                       </div>
                 </div>
+                <div class="haha">
+    <form action="/reviewSection" method="POST">
+        <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id }}">
+
+        <button type="submit" name="rating" value="like">&#128077;</button>
+        <button type="submit" name="rating" value="dislike">&#128078;</button>
+    </form>
+    <form action="/reviewSection" method="POST" style="display: flex; flex-direction: column; padding: 10px;">
+        <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id }}">
+        <input type="hidden" name="rating" value="none">
+
+        <textarea name="about" placeholder="Say something about the vendor?" required style="resize: none; background: none; color: white; padding: 10px; border-radius: 5px;"></textarea>
+        
+        <button type="submit" style="color: white; border: 1px solid white; font-size: 10px; margin-top: 10px;">Submit Review</button>
+    </form>
+</div>
+                </div>
+
             </div>
 
          {% endif %}
@@ -588,7 +629,24 @@
                          <div id = "bookNow"><a href="/bookingpanel?vendor_id={{ vendor.vendor_id }}&package=Gold&bill={{vendor.package3}}">BOOK NOW</a></div>
                       </div>
                 </div>
-            </div>
+                <div class="haha">
+    <form action="/reviewSection" method="POST">
+        <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id }}">
+
+        <button type="submit" name="rating" value="like">&#128077;</button>
+        <button type="submit" name="rating" value="dislike">&#128078;</button>
+    </form>
+    <form action="/reviewSection" method="POST" style="display: flex; flex-direction: column; padding: 10px;">
+        <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id }}">
+        <input type="hidden" name="rating" value="none">
+
+        <textarea name="about" placeholder="Say something about the vendor?" required style="resize: none; background: none; color: white; padding: 10px; border-radius: 5px;"></textarea>
+        
+        <button type="submit" style="color: white; border: 1px solid white; font-size: 10px; margin-top: 10px;">Submit Review</button>
+    </form>
+</div>
+
+        </div>
 
             {% endfor %}
 {% endif%}
@@ -602,38 +660,29 @@
 
           </section>
 
-          <!-- ======= TOP VENDORS SECTION ======= -->
-          <section class="vendors">
-                    <h2>Top Rated Vendors</h2>
-                    <div class="vendor-grid" id="vendorGrid">
-                              <div class="vendor-card">
-                                        <img src="/static/luma.jpeg" alt="Luma Studios">
+{% if VENDORS %}
+<section class="vendors">
+    <h2>Top Rated Vendors</h2>
+    {% for vendor in VENDORS %}
+        <div class="vendor-card" style="width: 40%; margin-left: 30%; margin-top: 20px;" >
+            {% if vendor['images'] and vendor['images']|length > 0 %}
+                <img src="{{ url_for('get_image', image_id=vendor['images'][0]) }}" alt="{{vendor['full_name']}}">
+            {% else %}
+                <img src="{{ url_for('static', filename='minhal.jpg') }}" alt="No Image">
+            {% endif %}
 
-                                        <div class="vendor-info">
-                                                  <h3>Luma Studios</h3>
-                                                  <p>Brand shoots & Portraits</p>
-                                                  <span>4.9★</span>
-                                        </div>
-                              </div>
-                              <div class="vendor-card">
-                                        <img src="/static/frame.jpeg" alt="FrameCraft">
-                                        <div class="vendor-info">
-                                                  <h3>FrameCraft</h3>
-                                                  <p>Weddings & Events</p>
-                                                  <span>4.8★</span>
-                                        </div>
-                              </div>
-                              <div class="vendor-card">
-                                        <img src="/static/silverlens.jpeg"
-                                                  alt="Silver Lens">
-                                        <div class="vendor-info">
-                                                  <h3>Silver Lens</h3>
-                                                  <p>Films & Commercial</p>
-                                                  <span>4.7★</span>
-                                        </div>
-                              </div>
-                    </div>
-          </section>
+            <div class="vendor-info">
+                <h3>{{ vendor['full_name'] }}</h3>
+                <p>{{ vendor['about'] }}</p>
+                <span>Likes: {{ vendor['likes'] }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+
+
 
           <!-- ======= FOOTER ======= -->
           <footer class="pixora-footer">
