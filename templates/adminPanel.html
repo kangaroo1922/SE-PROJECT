@@ -151,8 +151,9 @@
           fetch('/api/users'),
           fetch('/api/vendors')
         ]);
+         state.vendors = await vRes.json();
         state.users = await uRes.json();
-        state.vendors = await vRes.json();
+       
         renderAll();
       } catch (err) {
         console.error("Failed to fetch data", err);

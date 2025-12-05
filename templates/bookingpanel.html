@@ -118,35 +118,64 @@
   <input type="hidden" name="vendor_id" value="{{ vendor.vendor_id or '' }}" />
    <input type="hidden" name="bill" value="{{ bill or '' }}" />
   <label>Name</label>
-  <input type="text" id="name" name = "name" placeholder="Enter your full name" />
+  <input type="text" id="name" required name = "name" placeholder="Enter your full name" />
 
   <label>Contact Info</label>
-  <input type="text" id="contact" name = "contact" placeholder="Email or phone number" />
+  <input type="text" id="contact"  required name = "contact" placeholder="Email or phone number" />
 
   <label>Order Description</label>
-  <textarea id="description" name = "description" placeholder="Describe your order"></textarea>
+  <textarea id="description"  required name = "description" placeholder="Describe your order"></textarea>
 
   <label>Date</label>
-  <input type="date" id="date" name="date"/>
+  <input type="date" required id="date" name="date"/>
 
   <label>Venue Address</label>
-  <input type="text" id="address" name  = "address" placeholder="Enter venue address" />
+  <input type="text" id="address" required name  = "address" placeholder="Enter venue address" />
 
   <label>Payment Method</label>
   <select id="paymentMethod">
     <option value="cash">Cash</option>
-    <option value="card">Card (charged after approval)</option>
+    <option value="card">Card</option>
   </select>
 
   <div id="cardInfo" class="hidden">
     <label>Card Number</label>
-    <input type="text" id="cardNumber" name = "cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" />
+<input 
+    type="text" 
+    name="cardNumber" 
+    id = "cardNumber"
+    
+    maxlength="19"
+    pattern="^\d{4}-\d{4}-\d{4}-\d{4}$"
+    placeholder="1234-5678-9012-3456"
+    title="Enter card number in this exact format: 1234-5678-9012-3456"
+/>
+
+
 
     <label>Expiration Date</label>
-    <input type="month" id="expiry" name = "expiry"/>
+   <input 
+    type="date" 
+    id="expiry" 
+    name="expiry" 
+   
+    min="{{ today }}"
+/>
+
 
     <label>CVV</label>
-    <input type="text" name="cvv" id = "cvv" placeholder="123" />
+   <input 
+    type="text" 
+    name="cvv" 
+    id="cvv" 
+    placeholder="123" 
+   
+    maxlength="3" 
+    pattern="^\d{3}$" 
+    inputmode="numeric"
+    oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+    title="Numbers only"
+/>
   </div>
 
   <button type="submit">Submit Booking Request</button>
@@ -157,57 +186,43 @@
 </div>
 
 <script>
-  // Mock vendor bookings for demonstration
-  const bookedDates = ["2025-11-20", "2025-11-22"]; // Already booked
+const paymentMethod = document.getElementById("paymentMethod");
+const cardInfo = document.getElementById("cardInfo");
+const cardNumber = document.getElementById("cardNumber");
+const expiry = document.getElementById("expiry");
+const cvv = document.getElementById("cvv");
 
-  document.getElementById("paymentMethod").addEventListener("change", function () {
-    const cardInfo = document.getElementById("cardInfo");
+paymentMethod.addEventListener("change", function () {
     if (this.value === "card") {
-      cardInfo.classList.remove("hidden");
+        cardInfo.classList.remove("hidden");
+
+        // Make card fields required
+        cardNumber.required = true;
+        expiry.required = true;
+        cvv.required = true;
     } else {
-      cardInfo.classList.add("hidden");
+        cardInfo.classList.add("hidden");
+
+        // Remove required so form can submit
+        cardNumber.required = false;
+        expiry.required = false;
+        cvv.required = false;
+
+        // Clear previous values
+        cardNumber.value = "";
+        expiry.value = "";
+        cvv.value = "";
     }
-  });
+});
 
-/*  function submitBooking() {
-    const name = document.getElementById("name").value;
-    const contact = document.getElementById("contact").value;
-    const description = document.getElementById("description").value;
-    const date = document.getElementById("date").value;
-    const address = document.getElementById("address").value;
-    const paymentMethod = document.getElementById("paymentMethod").value;
-    const message = document.getElementById("message");
-
-    if (!name || !contact || !description || !date || !address) {
-      message.textContent = "Please fill all required fields.";
-      message.className = "error-msg";
-      return;
-    }
-
-    if (bookedDates.includes(date)) {
-      message.textContent = "Vendor is already booked on this date. Please choose another date or vendor.";
-      message.className = "error-msg";
-      return;
-    }
-
-    // If payment is card, validate minimal fields
-    if (paymentMethod === "card") {
-      const cardNum = document.getElementById("cardNumber").value;
-      const expiry = document.getElementById("expiry").value;
-      const cvv = document.getElementById("cvv").value;
-
-      if (!cardNum || !expiry || !cvv) {
-        message.textContent = "Please fill card details.";
-        message.className = "error-msg";
-        return;
-      }
-    }
-
-    // Pretend to send request to vendor
-    message.textContent = "Booking request sent! Awaiting vendor approval...";
-    message.className = "success-msg";
-  }*/
+// Card number auto-format
+cardNumber.addEventListener("input", function(e) {
+    let value = e.target.value.replace(/[^0-9]/g, ""); // remove non-digits
+    let formatted = value.match(/.{1,4}/g)?.join("-") || "";
+    e.target.value = formatted;
+});
 </script>
+
   <footer class="pixora-footer">
   <div class="footer-content">
     <p>Built with love for creators.</p>

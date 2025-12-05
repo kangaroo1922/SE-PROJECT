@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard - My Orders</title>
+    <style>
+        /* --- Global Styles --- */
+        body {
+            font-family: sans-serif;
+            background: #1a0e2c; /* Dark Purple */
+            color: white;
+            padding: 20px;
+        }
+
+        h1, h2 { text-align: center; color: #e0d4f7; }
+        
+        .container { max-width: 1000px; margin: auto; }
+
+        .btn-back {
+            display: inline-block;
+            background: #4a2b7a;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* --- HIGH CONTRAST TABLE STYLES --- */
+        .table-wrapper {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            color: black; /* Default text color for the wrapper */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white; /* Force table white */
+        }
+
+        thead {
+            background-color: #2c1952; /* Header Purple */
+            color: white; /* Header Text White */
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+        }
+
+        /* Force all rows to be white with black text */
+        tr {
+            background-color: white;
+            border-bottom: 1px solid #ccc;
+        }
+
+        td {
+            padding: 15px;
+            color: black; /* STRICT BLACK TEXT */
+            font-size: 16px;
+        }
+
+        /* Style for the Fallback text */
+        .empty-data {
+            color: red;
+            font-size: 0.8em;
+            font-style: italic;
+        }
+        .pixora-footer {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: Arial, sans-serif;
+}
+
+.pixora-footer h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.pixora-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.footer-links a {
+  color: #aaa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-links {
+  margin: 15px 0;
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="{{ url_for('vendorPanelUpdateBio') }}" class="btn-back">&#8592; Back to Profile</a>
+    <h2>Incoming Orders</h2>
+
+    {% if orders %}
+<form action="/markem" method="POST">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="color: black;">Date</th>
+                    <th style="color: black;">Customer Details</th>
+                    <th style="color: black;">Order Info</th>
+                    <th style="color: black;">Mark as complete</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in orders %}
+                <tr>
+
+                    <!-- Column 1: Date -->
+                    <td>
+                        <strong>{{ order['date']|default('No Date', true) }}</strong>
+                    </td>
+
+                    <!-- Column 2: Customer Info -->
+                    <td>
+                        <b>Name:</b> {{ order['fullName'] }}<br>
+                        <b>Contact:</b> {{ order['contact'] }}<br>
+                        <b>Address:</b> {{ order['address'] }}
+                    </td>
+
+                    <!-- Column 3: Order Info -->
+                    <td>
+                        <b>orderId:</b> {{ order['_id']|default('<span class="empty-data">No Name</span>')|safe }}<br>
+                        <b>description:</b> {{ order['description']|default('<span class="empty-data">No Contact</span>')|safe }}<br>
+                        <b>Bill:</b> {{ order['bill']|default('<span class="empty-data">No Address</span>')|safe }}<br>
+                        
+                    </td>
+
+                    <!-- Column 4: Decision -->
+                    <td>
+    
+                        <label>
+                            <input type="checkbox" name="completed" value="{{ order._id }}">
+                            Mark As Complete
+                        </label><br>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <br>
+    <button type="submit" style="padding:10px 20px; text-align: center; margin-left: 40%;">Update Orders</button>
+</form>
+
+    {% else %}
+    <div style="text-align: center; border: 2px dashed white; padding: 20px;">
+        <h3>No accepted orders found</h3>
+    </div>
+    {% endif %}
+</div>
+  <footer class="pixora-footer">
+  <div class="footer-content">
+    <p>Built with love for creators.</p>
+
+    <div class="footer-links">
+    <a href="mailto:i232008@isb.nu.edu.pk">Contact</a>
+    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms') }}">Terms</a>
+    </div>
+
+    <p class="copyright">© 2025 Pixora. All Rights Reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

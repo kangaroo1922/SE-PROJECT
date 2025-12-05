@@ -7,11 +7,13 @@ from flask import Flask, request, render_template, send_file
 import io
 from bson.errors import InvalidId
 import bcrypt
+from flask_bcrypt import Bcrypt
 import csv, io, os, datetime
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Replace with a strong secret key!
 from urllib.parse import quote_plus
 
+bcrypt = Bcrypt(app)
 password = quote_plus("zktQ@xud36XNaPZ")
 client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.5")
 db = client["wholeDB"]
@@ -75,7 +77,8 @@ def userSignUp():
             return render_template('userSignUp.html', message="Passwords do not match.")
         if users.find_one({"userName": userName}):
             return render_template('userSignUp.html', message="User '{userName}' already exists!")
-        users.insert_one({"userName": userName, "password": password})
+        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
+        users.insert_one({"userName": userName, "password": hashed_pw, "blocked": False})
     return render_template('userSignUp.html',message=None)
 
 @app.route('/userLogin' , methods=['GET' , 'POST'])
@@ -89,12 +92,16 @@ def userLogin():
             return render_template('userLogin.html' , message="please enter both the username and password")
         user_doc = users.find_one({
             "userName":userName,
-            "password":password
         })
         if user_doc:
-            session["client_name"] = user_doc["userName"]
-            session["client_id"] = str(user_doc["_id"])
-            return redirect(url_for('clientside'))
+            if user_doc and bcrypt.check_password_hash(user_doc["password"], password) and not user_doc["blocked"]:
+                session["client_name"] = user_doc["userName"]
+                session["client_id"] = str(user_doc["_id"])
+                return redirect(url_for('clientside'))
+            elif user_doc["blocked"]:
+                return render_template('userLogin.html', message="You have been blocked")
+            else:
+                return render_template('userLogin.html', message="Login failed, incorrect password or username")
         else:
             return render_template('userLogin.html', message="Login failed, incorrect password or username")
     return render_template('userLogin.html' , message=None)
@@ -179,29 +186,57 @@ def booking_details():
         expiry = request.form.get('expiry')
         cvv = request.form.get('cvv')
         
+        existing = userOrder.find_one({
+            "chosenVendorId" : vendor_id,
+            "date": date
+        })
+
+        if existing:
+            current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
+            return render_template('bookingpanel.html', message="The vendor is already booked for that date", vendor=current_vendor, bill = bill)
         # Helper to get session data safely
         userName = session.get("client_name")
         user_id = session.get("client_id")
 
         if not userName:
             return redirect(url_for('userLogin'))
-
-        # Insert the order
-        db['order_details'].insert_one({
-            "fullName": fullName,
-            "chosenVendorId": str(chosen_vendor["vendor_id"]),
-            "userName": userName,
-            "user_id": user_id,
-            "contact": contact,
-            "description": description,
-            "date": date,
-            "address": address,
-            "cardNumber": cardNumber,
-            "expiry": expiry,
-            "cvv": cvv,
-            "bill":bill,
-            "state":''
-        })
+        if not cardNumber == '':
+            hashedCardNumber = bcrypt.generate_password_hash(cardNumber).decode('utf-8')
+            hashedCardExpiry = bcrypt.generate_password_hash(expiry).decode('utf-8')
+            hashedCardCVV =  bcrypt.generate_password_hash(cvv).decode('utf-8')
+            # Insert the order
+            db['order_details'].insert_one({
+                "fullName": fullName,
+                "chosenVendorId": str(chosen_vendor["vendor_id"]),
+                "userName": userName,
+                "user_id": user_id,
+                "contact": contact,
+                "description": description,
+                "date": date,
+                "address": address,
+                "cardNumber": hashedCardNumber,
+                "expiry": hashedCardExpiry,
+                "cvv": hashedCardCVV,
+                "bill":bill,
+                "state":''
+            })
+        else:
+            # Insert the order
+            db['order_details'].insert_one({
+                "fullName": fullName,
+                "chosenVendorId": str(chosen_vendor["vendor_id"]),
+                "userName": userName,
+                "user_id": user_id,
+                "contact": contact,
+                "description": description,
+                "date": date,
+                "address": address,
+                "cardNumber": "",
+                "expiry": "",
+                "cvv": "",
+                "bill":bill,
+                "state":''
+            })  
         
         # Retrieve vendor for the success page (Safe Lookup)
         try:
@@ -209,8 +244,8 @@ def booking_details():
         except InvalidId:
             # Fallback: Try searching by the custom string 'vendor_id'
             current_vendor = vendorBio.find_one({"vendor_id": vendor_id})
-
-        return render_template('bookingpanel.html', message="Booking submitted successfully! Your total bill is", vendor=current_vendor, bill = bill)
+        message = f"Booking submitted successfully! Your total bill is {bill}"
+        return render_template('bookingpanel.html', message = message, vendor=current_vendor, bill = bill)
 
     # --- PART 2: LOADING THE PAGE (GET) ---
     else:
@@ -267,15 +302,42 @@ def updateOrders():
 
 
 
+@app.route('/markem', methods = ['POST'])
+def markem():
+    if request.method == 'POST':
+        # Get all selected checkboxes
+        completed_orders = request.form.getlist('completed')  # list of _id strings
+
+        if completed_orders:
+            # Convert to ObjectId
+            completed_object_ids = [ObjectId(oid) for oid in completed_orders]
+
+            # Delete all selected orders
+            userOrder.delete_many({"_id": {"$in": completed_object_ids}})
+
+            return redirect(url_for('markOrdersComplete'))
+
+        else:
+            return "No orders selected!"
 
 
-# ... existing code ...
+@app.route('/markOrdersComplete')
+def markOrdersComplete():
+    # This is the vendor_credentials._id stored as a string
+    current_vendor_id = session['vendor_id']
+    # 3. Fetch orders where chosenVendorId matches vendor_id and the state is accepted
+    my_orders = list(
+        db['order_details'].find({
+            "chosenVendorId": current_vendor_id,
+            "state": "accept"
+        }).sort("date", -1)
+    )
+    return render_template('markOrdersComplete.html', orders = my_orders)
 @app.route('/vendorDashboard')
 def vendorDashboard():
 
     # This is the vendor_credentials._id stored as a string
     current_vendor_id = session['vendor_id']
-    print(current_vendor_id)
     # 3. Fetch orders where chosenVendorId matches vendor_id
     my_orders = list(
     db['order_details'].find({
@@ -323,7 +385,6 @@ def userDashboard():
 
     return render_template('userDashboard.html', orders=my_orders, vendors_dict=vendors_dict)
 
-
 @app.route('/vendorSignUp' , methods=['GET', 'POST'])
 def vendor_signup():
     if request.method == 'GET':
@@ -338,7 +399,8 @@ def vendor_signup():
             return render_template('vendorSignUp.html', message="Passwords do not match.")
         if vendors.find_one({"userName": userName}):
             return render_template('vendorSignUp.html', message="Vendor '{userName}' already exists!")
-        vendors.insert_one({"userName": userName, "password": password})
+        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
+        vendors.insert_one({"userName": userName, "password": hashed_pw ,"blocked": False})
     return render_template('vendorSignUp.html' , message=None)
 
 @app.route('/vendorLogin' , methods=['GET' ,'POST'])
@@ -351,14 +413,17 @@ def vendor_login():
             #database fetching
             vendor_doc = vendors.find_one({
             "userName": userName,
-            "password": password
             })
         #checking for the validity of the extracted usernames and passwords
             if vendor_doc:
-                session["vendor_user"] = vendor_doc["userName"]
-                session["vendor_id"] = str(vendor_doc["_id"])
-                return redirect(url_for("vendorPanelUpdateBio"))
-
+                if vendor_doc and bcrypt.check_password_hash(vendor_doc["password"], password) and not vendor_doc["blocked"]:
+                    session["vendor_user"] = vendor_doc["userName"]
+                    session["vendor_id"] = str(vendor_doc["_id"])
+                    return redirect(url_for("vendorPanelUpdateBio"))
+                elif vendor_doc["blocked"]:
+                    return render_template('vendorLogin.html', message = "You have been blocked!")
+                else:
+                    return render_template('vendorLogin.html', message = "Login failed credentials do not match!")
             else:
                 return render_template('vendorLogin.html', message = "Login failed credentials do not match!")
     return render_template('vendorLogin.html', message=None)
@@ -417,7 +482,7 @@ def vendorPanelUpdateBio():
 def create_admin():
     existing = admin_collection.find_one({"username": "admin"})
     if not existing:
-        hashed_pass = bcrypt.hashpw("admin123".encode('utf-8'), bcrypt.gensalt())
+        hashed_pass = bcrypt.generate_password_hash("admin123".encode('utf-8'))
         admin_collection.insert_one({
             "username": "admin",
             "password": hashed_pass
@@ -436,7 +501,8 @@ def adminLogin():
 
         if admin:
             # Check password hash
-            if bcrypt.checkpw(password.encode('utf-8'), admin["password"]):
+            #if vendor_doc and bcrypt.check_password_hash(vendor_doc["password"], password):
+            if bcrypt.check_password_hash(admin["password"], password):
                 session["admin"] = username
                 return redirect(url_for('adminPanel'))
             else:
@@ -488,6 +554,10 @@ def get_users_api():
 
 @app.route("/api/users/<user_id>", methods=["PATCH", "DELETE"])
 def manage_user_api(user_id):
+    users.update_many(
+            {"blocked": {"$exists": False}},  # filter: only docs without 'blocked'
+            {"$set": {"blocked": False}}      # set 'blocked' to False
+        )
     try:
         oid = ObjectId(user_id)
     except:
@@ -504,7 +574,12 @@ def manage_user_api(user_id):
         # Map frontend fields to DB fields
         if "email" in data: update_fields["userName"] = data["email"]
         if "balance" in data: update_fields["balance"] = float(data["balance"])
-        if "blocked" in data: update_fields["blocked"] = bool(data["blocked"])
+        if "blocked" in data: 
+            update_fields["blocked"] = bool(data["blocked"])
+            users.update_one(
+                {"_id": oid},
+                {"$set": {"blocked": data["blocked"] }}
+            )
         
         if update_fields:
             users.update_one({"_id": oid}, {"$set": update_fields})
@@ -514,28 +589,42 @@ def manage_user_api(user_id):
 @app.route("/api/vendors", methods=["GET"])
 def get_vendors_api():
     try:
-        # Vendor data is split: Credentials (auth/block status) + Biodata (profile/revenue)
         creds = list(vendors.find({}))
         merged_list = []
-        
+
         for v in creds:
-            vid = str(v["_id"])
+            vid = str(v["_id"])  # convert ObjectId to string
+
+            # Lookup bio; if not found, use empty dict
             bio = vendorBio.find_one({"vendor_id": vid}) or {}
-            
+
+            # Safely extract fields with defaults
+            full_name = bio.get("full_name") or v.get("userName") or "Unknown"
+            rating = float(bio.get("rating", 0.0) or 0.0)
+            revenue = float(bio.get("revenue", 0.0) or 0.0)
+            reviews = int(bio.get("reviews", 0) or 0)
+            blocked = bool(v.get("blocked", False))
+
             merged_list.append({
                 "id": vid,
-                "name": bio.get("full_name") or v.get("userName", "Unknown"),
-                "rating": float(bio.get("rating", 0.0)),
-                "revenue": float(bio.get("revenue", 0.0)),
-                "reviews": int(bio.get("reviews", 0)),
-                "blocked": v.get("blocked", False)
+                "name": full_name,
+                "rating": rating,
+                "revenue": revenue,
+                "reviews": reviews,
+                "blocked": blocked
             })
+
         return jsonify(merged_list)
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/vendors/<vendor_id>", methods=["PATCH", "DELETE"])
 def manage_vendor_api(vendor_id):
+    vendors.update_many(
+            {"blocked": {"$exists": False}},  # filter: only docs without 'blocked'
+            {"$set": {"blocked": False}}      # set 'blocked' to False
+        )
     try:
         oid = ObjectId(vendor_id)
     except:
@@ -551,7 +640,12 @@ def manage_vendor_api(vendor_id):
         
         # 1. Update Credentials Collection (Blocked Status / Username)
         cred_updates = {}
-        if "blocked" in data: cred_updates["blocked"] = data["blocked"]
+        if "blocked" in data: 
+            cred_updates["blocked"] = data["blocked"]
+            vendors.update_one(
+                {"_id": oid},
+                {"$set": {"blocked": data["blocked"] }}
+            )
         if cred_updates:
             vendors.update_one({"_id": oid}, {"$set": cred_updates})
         

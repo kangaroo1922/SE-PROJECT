@@ -537,6 +537,7 @@
                              
                               <button class="ghost"><a href="{{url_for('home')}}" style="text-decoration: none; color: white;">Logout</a></button>
                               <button class="ghost"><a href="{{url_for('vendorDashboard')}}" style="text-decoration: none; color: white;">View Orders</a></button>
+                              <button class="ghost"><a href="{{url_for('markOrdersComplete')}}" style="text-decoration: none; color: white;">Mark Orders As Complete</a></button>
                               <button class="primary"><a href="{{url_for('vendorPanelUpdateBio')}}" style="text-decoration: none; color: white;">Update Profile</a></button>
                     </nav>
           </header>
@@ -560,6 +561,8 @@
                                                                                 class="muted">dislikes</span></div>
                                                             <div><strong id="since">{{vendor.orders_completed}}</strong> <span
                                                                                 class="muted">orders completed</span></div>
+                                                            <div><strong id="revenue">{{vendor.revenue}}</strong> <span
+                                                                                class="muted">Net Income</span></div>
                                                   </div>
                                         </div>
                               </div>
